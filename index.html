@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram Pro Clone</title>
+    <title>Instagram AI Edition</title>
     <style>
         :root {
             --bg: #ffffff;
@@ -11,221 +11,270 @@
             --border: #dbdbdb;
             --blue: #0095f6;
             --gray: #8e8e8e;
+            --heart: #ed4956;
             --story-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* Top Bar */
+        /* Header */
         header {
-            height: 50px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 15px;
-            background: #fff;
-            z-index: 100;
+            height: 60px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; background: #fff; position: sticky; top: 0; z-index: 1000;
         }
+        .logo { font-size: 24px; font-weight: bold; font-style: italic; }
+        .header-icons { display: flex; gap: 20px; font-size: 22px; cursor: pointer; }
 
-        .logo { font-weight: bold; font-size: 20px; }
+        /* Main Content */
+        #app-body { flex: 1; overflow-y: auto; padding-bottom: 60px; transition: all 0.3s; }
 
-        /* Main Content Area */
-        #main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 60px; /* Space for bottom nav */
+        /* Stories */
+        .stories-bar {
+            display: flex; padding: 15px 10px; gap: 15px; overflow-x: auto;
+            border-bottom: 1px solid var(--border); scrollbar-width: none;
         }
-
-        /* Stories Section */
-        .stories-container {
-            display: flex;
-            padding: 10px;
-            gap: 15px;
-            overflow-x: auto;
-            border-bottom: 1px solid var(--border);
-            scrollbar-width: none;
+        .stories-bar::-webkit-scrollbar { display: none; }
+        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 75px; cursor: pointer; }
+        .ring {
+            width: 66px; height: 66px; border-radius: 50%; background: var(--story-gradient);
+            padding: 2px; margin-bottom: 5px;
         }
-        .stories-container::-webkit-scrollbar { display: none; }
-
-        .story {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 70px;
+        .avatar {
+            width: 100%; height: 100%; border-radius: 50%; background-size: cover;
+            background-position: center; border: 2px solid #fff;
         }
+        .username-label { font-size: 11px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .story-ring {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: var(--story-gradient);
-            padding: 2px;
-            margin-bottom: 5px;
+        /* Feed Posts */
+        .post { border-bottom: 1px solid var(--border); margin-bottom: 15px; }
+        .post-header { padding: 12px; display: flex; align-items: center; }
+        .mini-avatar { width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; background-size: cover; }
+        .post-user { font-weight: 600; font-size: 14px; }
+        .post-main-img { width: 100%; background-color: #efefef; }
+        .post-actions { padding: 12px; display: flex; gap: 15px; font-size: 24px; }
+        .action-btn { cursor: pointer; transition: transform 0.1s; }
+        .action-btn:active { transform: scale(1.2); }
+        .post-likes { padding: 0 12px; font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+        .post-caption { padding: 0 12px 12px; font-size: 14px; line-height: 1.4; }
+
+        /* Reels Section */
+        .reels-view { background: #000; color: #fff; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        .reel-card {
+            height: calc(100vh - 60px); width: 100%; scroll-snap-align: start;
+            position: relative; display: flex; flex-direction: column; justify-content: flex-end;
+            background-size: cover; background-position: center;
         }
-
-        .story-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: #eee;
-            border: 2px solid #fff;
+        .reel-overlay { padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); z-index: 5; }
+        .reel-side {
+            position: absolute; right: 15px; bottom: 100px; display: flex;
+            flex-direction: column; gap: 20px; align-items: center; z-index: 10;
         }
+        .side-icon { font-size: 28px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .side-icon span { font-size: 12px; margin-top: 5px; font-weight: bold; }
 
-        .story-user { font-size: 11px; color: var(--text); }
+        /* Messages View */
+        .messages-view { padding: 15px; }
+        .msg-item { display: flex; align-items: center; padding: 12px 0; cursor: pointer; }
+        .msg-item:active { background: #fafafa; }
+        .msg-avatar { width: 56px; height: 56px; border-radius: 50%; margin-right: 15px; background-size: cover; }
+        .msg-content h4 { font-size: 14px; margin-bottom: 3px; }
+        .msg-content p { font-size: 13px; color: var(--gray); }
 
-        /* Feed Section */
-        .post { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        .post-header { padding: 10px; display: flex; align-items: center; }
-        .post-avatar { width: 32px; height: 32px; border-radius: 50%; background: #eee; margin-right: 10px; }
-        .post-img { width: 100%; aspect-ratio: 1/1; background: #fafafa; display: flex; align-items: center; justify-content: center; font-size: 50px; }
-        .post-actions { padding: 10px; display: flex; gap: 15px; font-size: 24px; }
-        .post-info { padding: 0 10px 10px; font-size: 14px; }
-
-        /* Reels Mode (Full Screen) */
-        .reels-mode { background: #000; color: #fff; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .reels-mode .reel { height: calc(100vh - 50px); scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; font-size: 100px; }
-        .reels-mode .reel-info { position: absolute; bottom: 20px; left: 20px; z-index: 10; }
-
-        /* Messages Section */
-        .messages-container { padding: 20px; }
-        .chat-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .chat-avatar { width: 50px; height: 50px; border-radius: 50%; background: #eee; margin-right: 15px; }
-        .chat-info h4 { font-size: 14px; }
-        .chat-info p { font-size: 13px; color: var(--gray); }
-
-        /* Bottom Nav */
+        /* Bottom Navigation */
         nav.bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 50px;
-            border-top: 1px solid var(--border);
-            background: #fff;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            font-size: 24px;
+            position: fixed; bottom: 0; width: 100%; height: 60px;
+            background: #fff; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
         }
-
-        .nav-item { cursor: pointer; color: var(--text); }
-        .nav-item.active { color: var(--blue); }
+        .nav-icon { font-size: 26px; cursor: pointer; color: var(--text); }
+        .nav-icon.active { color: var(--blue); }
 
         .hidden { display: none; }
+        .liked { color: var(--heart) !important; }
     </style>
 </head>
 <body>
 
-    <header id="app-header">
+    <header id="main-header">
         <div class="logo">Instagram</div>
-        <div style="font-size: 20px; cursor: pointer;" onclick="showTab('messages')">📩</div>
+        <div class="header-icons">
+            <span onclick="alert('Funcionalidade de Notificações em breve!')">❤️</span>
+            <span onclick="showSection('messages')">📩</span>
+        </div>
     </header>
 
-    <div id="main-content">
-        <!-- TAB: HOME -->
-        <div id="tab-home">
-            <div class="stories-container">
-                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">Seu story</span></div>
-                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">ana_clara</span></div>
-                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">joao_dev</span></div>
-                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">marcos_99</span></div>
-                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">bia_arts</span></div>
+    <main id="app-body">
+        <!-- HOME SECTION -->
+        <section id="sec-home">
+            <div class="stories-bar" id="stories-list">
+                <!-- Stories gerados dinamicamente -->
             </div>
-            <div id="feed">
-                <!-- Posts will be here -->
+            <div id="feed-list">
+                <!-- Posts gerados dinamicamente -->
             </div>
-        </div>
+        </section>
 
-        <!-- TAB: REELS -->
-        <div id="tab-reels" class="hidden reels-mode">
-            <div class="reel" style="background: #1a1a1a;">🎬</div>
-            <div class="reel" style="background: #2c3e50;">🔥</div>
-            <div class="reel" style="background: #8e44ad;">✨</div>
-        </div>
+        <!-- REELS SECTION -->
+        <section id="sec-reels" class="hidden reels-view">
+            <!-- Reels gerados dinamicamente -->
+        </section>
 
-        <!-- TAB: MESSAGES -->
-        <div id="tab-messages" class="hidden">
-            <div class="messages-container">
-                <h2 style="margin-bottom: 20px;">Mensagens</h2>
-                <div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><h4>Ana Clara</h4><p>Enviou uma mensagem agora</p></div></div>
-                <div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><h4>João Dev</h4><p>Visto há 2h</p></div></div>
-                <div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><h4>Bia Arts</h4><p>Olá! Tudo bem?</p></div></div>
+        <!-- MESSAGES SECTION -->
+        <section id="sec-messages" class="hidden messages-view">
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                <span onclick="showSection('home')" style="cursor:pointer; font-size: 24px; margin-right: 15px;">⬅️</span>
+                <h2>Mensagens</h2>
             </div>
-        </div>
-    </div>
+            <div id="msg-list"></div>
+        </section>
+    </main>
 
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="showTab('home')">🏠</div>
-        <div class="nav-item" onclick="alert('Explorar em breve!')">🔍</div>
-        <div class="nav-item" onclick="showTab('reels')">🎞️</div>
-        <div class="nav-item" onclick="alert('Loja em breve!')">🛍️</div>
-        <div class="nav-item" onclick="alert('Perfil em breve!')">👤</div>
+        <div class="nav-icon active" id="nav-home" onclick="showSection('home')">🏠</div>
+        <div class="nav-icon" onclick="alert('Explorar em breve!')">🔍</div>
+        <div class="nav-icon" id="nav-reels" onclick="showSection('reels')">🎞️</div>
+        <div class="nav-icon" onclick="alert('Câmera aberta!')">➕</div>
+        <div class="nav-icon" onclick="alert('Perfil de vitor_gabriel')">👤</div>
     </nav>
 
     <script>
-        function showTab(tabName) {
-            // Hide all tabs
-            document.getElementById('tab-home').classList.add('hidden');
-            document.getElementById('tab-reels').classList.add('hidden');
-            document.getElementById('tab-messages').classList.add('hidden');
-            
-            // Show selected tab
-            document.getElementById('tab-' + tabName).classList.remove('hidden');
-
-            // Handle header and background
-            const header = document.getElementById('app-header');
-            const content = document.getElementById('main-content');
-            
-            if (tabName === 'reels') {
-                header.style.background = '#000';
-                header.style.color = '#fff';
-                header.style.borderBottom = 'none';
-                content.style.background = '#000';
-            } else {
-                header.style.background = '#fff';
-                header.style.color = '#000';
-                header.style.borderBottom = '1px solid #dbdbdb';
-                content.style.background = '#fff';
-            }
-
-            // Update Nav Active State
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            // (Simple logic: just visual feedback for the demo)
-        }
-
-        // Render Initial Feed
-        const feed = document.getElementById('feed');
-        const posts = [
-            { user: 'ana_clara', emoji: '📸', caption: 'Dia incrível na praia! ☀️' },
-            { user: 'joao_dev', emoji: '💻', caption: 'Codando o dia todo... ☕' }
+        // Dados Simulados com Imagens de IA (Unsplash Source)
+        const users = [
+            { name: 'vitor_ai', img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop' },
+            { name: 'ana_dev', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop' },
+            { name: 'tech_guru', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
+            { name: 'luna_arts', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop' },
+            { name: 'marcos_photo', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' }
         ];
 
-        posts.forEach(post => {
-            const div = document.createElement('div');
-            div.className = 'post';
-            div.innerHTML = `
-                <div class="post-header"><div class="post-avatar"></div><strong>${post.user}</strong></div>
-                <div class="post-img">${post.emoji}</div>
-                <div class="post-actions"><span>❤️</span><span>💬</span><span>✈️</span></div>
-                <div class="post-info"><strong>${post.user}</strong> ${post.caption}</div>
-            `;
-            feed.appendChild(div);
-        });
+        const postsData = [
+            { user: users[1], content: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=600&fit=crop', caption: 'Focada no código hoje! 💻✨', likes: 1240 },
+            { user: users[2], content: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=600&fit=crop', caption: 'O setup dos sonhos está pronto. 🚀', likes: 850 }
+        ];
+
+        const reelsData = [
+            { user: users[3], bg: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=1000&fit=crop', caption: 'Nova pintura em progresso! 🎨', likes: '45K' },
+            { user: users[4], bg: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=1000&fit=crop', caption: 'A natureza é perfeita. 🏔️', likes: '12K' }
+        ];
+
+        // Lógica de Navegação
+        function showSection(section) {
+            const sections = ['home', 'reels', 'messages'];
+            sections.forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
+            document.getElementById('sec-' + section).classList.remove('hidden');
+
+            // Reset Nav Icons
+            document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
+            if (section !== 'messages') document.getElementById('nav-' + section).classList.add('active');
+
+            // Header Style
+            const header = document.getElementById('main-header');
+            if (section === 'reels') {
+                header.style.background = '#000'; header.style.color = '#fff'; header.style.border = 'none';
+            } else {
+                header.style.background = '#fff'; header.style.color = '#000'; header.style.borderBottom = '1px solid #dbdbdb';
+            }
+        }
+
+        // Renderizar Stories
+        function initStories() {
+            const list = document.getElementById('stories-list');
+            users.forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'story-item';
+                div.innerHTML = `
+                    <div class="ring"><div class="avatar" style="background-image: url('${u.img}')"></div></div>
+                    <span class="username-label">${u.name}</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Renderizar Feed
+        function initFeed() {
+            const list = document.getElementById('feed-list');
+            postsData.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'post';
+                div.innerHTML = `
+                    <div class="post-header">
+                        <div class="mini-avatar" style="background-image: url('${p.user.img}')"></div>
+                        <span class="post-user">${p.user.name}</span>
+                    </div>
+                    <img src="${p.content}" class="post-main-img" ondblclick="togglePostLike(this, ${index})">
+                    <div class="post-actions">
+                        <span class="action-btn" onclick="togglePostLike(this, ${index})">🤍</span>
+                        <span class="action-btn">💬</span>
+                        <span class="action-btn">✈️</span>
+                    </div>
+                    <div class="post-likes">${p.likes} curtidas</div>
+                    <div class="post-caption"><strong>${p.user.name}</strong> ${p.caption}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Renderizar Reels
+        function initReels() {
+            const list = document.getElementById('sec-reels');
+            reelsData.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'reel-card';
+                div.style.backgroundImage = `url('${r.bg}')`;
+                div.innerHTML = `
+                    <div class="reel-side">
+                        <div class="side-icon" onclick="this.classList.toggle('liked')">🤍<span>${r.likes}</span></div>
+                        <div class="side-icon">💬<span>128</span></div>
+                        <div class="side-icon">✈️</div>
+                        <div class="side-icon">...</div>
+                    </div>
+                    <div class="reel-overlay">
+                        <div style="display:flex; align-items:center; margin-bottom:10px;">
+                            <div class="mini-avatar" style="background-image: url('${r.user.img}'); border: 1px solid #fff;"></div>
+                            <span style="font-weight:bold; margin-right:10px;">${r.user.name}</span>
+                            <button style="background:transparent; border:1px solid #fff; color:#fff; padding:2px 8px; border-radius:4px; font-size:12px;">Seguir</button>
+                        </div>
+                        <p style="font-size:14px;">${r.caption}</p>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Renderizar Mensagens
+        function initMessages() {
+            const list = document.getElementById('msg-list');
+            users.slice(1).forEach(u => {
+                const div = document.createElement('div');
+                div.className = 'msg-item';
+                div.innerHTML = `
+                    <div class="msg-avatar" style="background-image: url('${u.img}')"></div>
+                    <div class="msg-content">
+                        <h4>${u.name}</h4>
+                        <p>Visto agora mesmo</p>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Funções de Interação
+        function togglePostLike(btn, index) {
+            const heart = btn.tagName === 'IMG' ? btn.nextElementSibling.children[0] : btn;
+            heart.classList.toggle('liked');
+            heart.innerHTML = heart.classList.contains('liked') ? '❤️' : '🤍';
+        }
+
+        // Inicialização
+        window.onload = () => {
+            initStories();
+            initFeed();
+            initReels();
+            initMessages();
+        };
     </script>
 </body>
 </html>
