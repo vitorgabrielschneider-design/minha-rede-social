@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VTGUIA - Social App</title>
+    <title>VTGUIA - Full Experience</title>
     <style>
         :root {
             --bg: #fafafa;
@@ -17,92 +17,74 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
 
-        /* Centralizar o "Celular" na tela */
-        body { 
-            background-color: var(--bg); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
+        body { background-color: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
 
-        /* Container que simula o Celular */
         .phone-container {
-            width: 375px; /* Largura padrão iPhone */
-            height: 667px; /* Altura padrão iPhone */
-            background-color: var(--app-bg);
-            border: 8px solid #333;
-            border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            width: 375px; height: 667px; background-color: var(--app-bg);
+            border: 8px solid #333; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            position: relative; display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Header do App */
         header {
             height: 50px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; background: #fff; flex-shrink: 0;
+            padding: 0 15px; background: #fff; flex-shrink: 0; z-index: 10;
         }
-        .logo { font-size: 20px; font-weight: bold; color: var(--text); letter-spacing: -1px; }
+        .logo { font-size: 20px; font-weight: bold; color: var(--text); }
 
-        /* Área de Conteúdo */
         #app-body { flex: 1; overflow-y: auto; position: relative; scrollbar-width: none; }
         #app-body::-webkit-scrollbar { display: none; }
 
-        /* Stories */
-        .stories-bar {
-            display: flex; padding: 10px; gap: 12px; overflow-x: auto;
-            border-bottom: 1px solid var(--border); scrollbar-width: none;
-        }
-        .stories-bar::-webkit-scrollbar { display: none; }
-        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 65px; cursor: pointer; }
-        .ring {
-            width: 56px; height: 56px; border-radius: 50%; background: var(--story-gradient);
-            padding: 2px; margin-bottom: 4px;
-        }
-        .avatar {
-            width: 100%; height: 100%; border-radius: 50%; background-size: cover;
-            background-position: center; border: 2px solid #fff;
-        }
-        .story-item span { font-size: 10px; }
+        /* Sections */
+        .section { height: 100%; display: flex; flex-direction: column; }
+        .hidden { display: none !important; }
 
-        /* Posts */
-        .post { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        .post-header { padding: 8px 12px; display: flex; align-items: center; }
+        /* Stories & Feed */
+        .stories-bar { display: flex; padding: 10px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); }
+        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 65px; cursor: pointer; }
+        .ring { width: 56px; height: 56px; border-radius: 50%; background: var(--story-gradient); padding: 2px; }
+        .avatar { width: 100%; height: 100%; border-radius: 50%; background-size: cover; border: 2px solid #fff; }
+        .post { border-bottom: 1px solid var(--border); }
+        .post-header { padding: 8px 12px; display: flex; align-items: center; font-size: 13px; }
         .mini-avatar { width: 28px; height: 28px; border-radius: 50%; margin-right: 8px; background-size: cover; }
-        .post-img { width: 100%; display: block; }
-        .post-info { padding: 8px 12px; font-size: 13px; }
+        .post-img { width: 100%; }
 
         /* Reels */
-        .reels-view { background: #000; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
-        .reels-view::-webkit-scrollbar { display: none; }
+        .reels-view { background: #000; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .reel-card { height: 100%; width: 100%; scroll-snap-align: start; position: relative; }
         video.reel-video { width: 100%; height: 100%; object-fit: cover; }
-        .reel-overlay { position: absolute; bottom: 10px; left: 10px; color: #fff; z-index: 5; font-size: 12px; }
+        .reel-overlay { position: absolute; bottom: 20px; left: 15px; color: #fff; font-size: 13px; z-index: 5; }
+
+        /* Chat */
+        .chat-list { padding: 10px; }
+        .chat-item { display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px; }
+        .chat-item:active { background: #f0f0f0; }
+        .chat-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 100; display: flex; flex-direction: column; }
+        .chat-header { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 15px; }
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 8px 12px; border-radius: 18px; max-width: 80%; font-size: 14px; }
+        .bubble.sent { background: var(--blue); color: #fff; align-self: flex-end; }
+        .bubble.received { background: #efefef; align-self: flex-start; }
+        .chat-input { padding: 10px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .chat-input input { flex: 1; border: 1px solid var(--border); border-radius: 20px; padding: 8px 15px; outline: none; }
+
+        /* Profile */
+        .profile-view { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .profile-avatar-big { width: 100px; height: 100px; border-radius: 50%; background-size: cover; margin-bottom: 15px; border: 1px solid var(--border); cursor: pointer; }
+        .profile-name { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+        .edit-form { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        .edit-form input { padding: 10px; border: 1px solid var(--border); border-radius: 5px; }
+        .save-btn { background: var(--blue); color: #fff; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* Bottom Nav */
+        nav.bottom-nav { height: 50px; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; }
+        .nav-icon { font-size: 20px; cursor: pointer; }
 
         /* Story Viewer */
-        #story-viewer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000; display: none; flex-direction: column;
-        }
+        #story-viewer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: none; flex-direction: column; }
         .story-progress { display: flex; gap: 4px; padding: 8px; position: absolute; top: 0; width: 100%; }
         .progress-bar { height: 2px; background: rgba(255,255,255,0.3); flex: 1; border-radius: 1px; overflow: hidden; }
         .progress-fill { height: 100%; background: #fff; width: 0%; transition: width linear; }
-        .story-header { display: flex; align-items: center; padding: 15px 10px; color: #fff; z-index: 10; font-size: 12px; }
-        .story-content { flex: 1; display: flex; align-items: center; justify-content: center; }
-        .story-content img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* Bottom Nav */
-        nav.bottom-nav {
-            height: 50px; background: #fff; border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; align-items: center; flex-shrink: 0;
-        }
-        .nav-icon { font-size: 20px; cursor: pointer; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -110,27 +92,48 @@
     <div class="phone-container">
         <header id="main-header">
             <div class="logo">VTGUIA</div>
-            <div style="font-size: 18px; cursor: pointer;">📩</div>
+            <div style="font-size: 18px; cursor: pointer;" onclick="showSection('chat')">📩</div>
         </header>
 
         <main id="app-body">
             <!-- HOME -->
-            <section id="sec-home">
+            <section id="sec-home" class="section">
                 <div class="stories-bar" id="stories-list"></div>
-                <div id="feed-list"></div>
+                <div id="feed-list" style="overflow-y: auto;"></div>
             </section>
 
             <!-- REELS -->
-            <section id="sec-reels" class="hidden reels-view"></section>
+            <section id="sec-reels" class="section hidden reels-view">
+                <div class="reel-card"><video class="reel-video" src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4" loop muted autoplay></video><div class="reel-overlay"><strong>@cyber_vibe</strong><p>Neon nights ⚡</p></div></div>
+                <div class="reel-card"><video class="reel-video" src="https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-leaves-low-angle-shot-1579-large.mp4" loop muted autoplay></video><div class="reel-overlay"><strong>@nature_vt</strong><p>Outono mágico 🍂</p></div></div>
+            </section>
+
+            <!-- CHAT LIST -->
+            <section id="sec-chat" class="section hidden">
+                <div class="chat-header"><span onclick="showSection('home')" style="cursor:pointer; margin-right:15px;">⬅️</span><strong>Mensagens</strong></div>
+                <div class="chat-list" id="chat-list"></div>
+                <!-- Chat Screen (Nested) -->
+                <div id="chat-screen" class="chat-screen hidden">
+                    <div class="chat-header"><span onclick="closeChat()" style="cursor:pointer; margin-right:15px;">⬅️</span><strong id="chat-user-title"></strong></div>
+                    <div class="chat-messages" id="chat-msgs"></div>
+                    <div class="chat-input"><input type="text" id="msg-input" placeholder="Mensagem..."><button onclick="sendMessage()" style="border:none; background:none; color:var(--blue); font-weight:bold;">Enviar</button></div>
+                </div>
+            </section>
+
+            <!-- PROFILE -->
+            <section id="sec-profile" class="section hidden profile-view">
+                <div class="profile-avatar-big" id="my-avatar" style="background-image: url('https://images.unsplash.com/photo-153571501da13a22ce55605e1a455d04?w=200&h=200&fit=crop')"></div>
+                <div class="profile-name" id="my-name-display">Vitor Gabriel</div>
+                <div class="edit-form">
+                    <input type="text" id="edit-name" placeholder="Novo nome">
+                    <input type="text" id="edit-photo" placeholder="URL da foto">
+                    <button class="save-btn" onclick="saveProfile()">Salvar Alterações</button>
+                </div>
+            </section>
 
             <!-- STORY VIEWER -->
             <div id="story-viewer">
                 <div class="story-progress"><div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div></div>
-                <div class="story-header">
-                    <div class="mini-avatar" id="story-user-img" style="width:30px; height:30px;"></div>
-                    <strong id="story-username" style="margin-left:8px;"></strong>
-                    <span style="margin-left:auto; cursor:pointer; font-size:20px;" onclick="closeStory()">×</span>
-                </div>
                 <div class="story-content"><img id="story-img" src=""></div>
             </div>
         </main>
@@ -138,23 +141,18 @@
         <nav class="bottom-nav">
             <div class="nav-icon" onclick="showSection('home')">🏠</div>
             <div class="nav-icon" onclick="showSection('reels')">🎞️</div>
-            <div class="nav-icon">👤</div>
+            <div class="nav-icon" onclick="showSection('profile')">👤</div>
         </nav>
     </div>
 
     <script>
         const users = [
             { name: 'ana_travel', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=1000&fit=crop' },
-            { name: 'joao_tech', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=1000&fit=crop' },
-            { name: 'luna_arts', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=1000&fit=crop' }
-        ];
-
-        const reelsVideos = [
-            'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4',
-            'https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-leaves-low-angle-shot-1579-large.mp4'
+            { name: 'joao_tech', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=1000&fit=crop' }
         ];
 
         function initApp() {
+            // Render Stories
             const sList = document.getElementById('stories-list');
             users.forEach((u, i) => {
                 const div = document.createElement('div');
@@ -164,6 +162,7 @@
                 sList.appendChild(div);
             });
 
+            // Render Feed
             const fList = document.getElementById('feed-list');
             users.forEach(u => {
                 const div = document.createElement('div');
@@ -173,40 +172,67 @@
                 fList.appendChild(div);
             });
 
-            const rList = document.getElementById('sec-reels');
-            reelsVideos.forEach(v => {
+            // Render Chats
+            const cList = document.getElementById('chat-list');
+            users.forEach(u => {
                 const div = document.createElement('div');
-                div.className = 'reel-card';
-                div.innerHTML = `<video class="reel-video" src="${v}" loop muted autoplay></video>
-                                 <div class="reel-overlay"><strong>@reels_trend</strong><p>Vídeo incrível! 🔥</p></div>`;
-                rList.appendChild(div);
+                div.className = 'chat-item';
+                div.onclick = () => openChat(u.name);
+                div.innerHTML = `<div class="mini-avatar" style="background-image:url('${u.img}'); width:45px; height:45px;"></div>
+                                 <div><strong>${u.name}</strong><p style="font-size:12px; color:var(--gray);">Olá! Tudo bem?</p></div>`;
+                cList.appendChild(div);
             });
         }
 
         function showSection(sec) {
-            document.getElementById('sec-home').classList.toggle('hidden', sec !== 'home');
-            document.getElementById('sec-reels').classList.toggle('hidden', sec !== 'reels');
-            document.getElementById('main-header').style.display = sec === 'reels' ? 'none' : 'flex';
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('sec-' + sec).classList.remove('hidden');
+            document.getElementById('main-header').style.display = (sec === 'reels' || sec === 'chat') ? 'none' : 'flex';
         }
 
+        // Chat Logic
+        function openChat(name) {
+            document.getElementById('chat-user-title').innerText = name;
+            document.getElementById('chat-screen').classList.remove('hidden');
+            document.getElementById('chat-msgs').innerHTML = `<div class="bubble received">Oi! Vi suas fotos novas, ficaram ótimas!</div>`;
+        }
+        function closeChat() { document.getElementById('chat-screen').classList.add('hidden'); }
+        function sendMessage() {
+            const input = document.getElementById('msg-input');
+            if (!input.value) return;
+            const div = document.createElement('div');
+            div.className = 'bubble sent';
+            div.innerText = input.value;
+            document.getElementById('chat-msgs').appendChild(div);
+            input.value = '';
+            document.getElementById('chat-msgs').scrollTop = document.getElementById('chat-msgs').scrollHeight;
+        }
+
+        // Profile Logic
+        function saveProfile() {
+            const name = document.getElementById('edit-name').value;
+            const photo = document.getElementById('edit-photo').value;
+            if (name) {
+                document.getElementById('my-name-display').innerText = name;
+                document.getElementById('edit-name').value = '';
+            }
+            if (photo) {
+                document.getElementById('my-avatar').style.backgroundImage = `url('${photo}')`;
+                document.getElementById('edit-photo').value = '';
+            }
+            alert('Perfil atualizado!');
+        }
+
+        // Story Logic
         let storyTimer;
         function openStory(index) {
             const viewer = document.getElementById('story-viewer');
             const fill = document.getElementById('prog-fill');
-            const user = users[index];
-            document.getElementById('story-username').innerText = user.name;
-            document.getElementById('story-user-img').style.backgroundImage = `url('${user.img}')`;
-            document.getElementById('story-img').src = user.story;
+            document.getElementById('story-img').src = users[index].story;
             viewer.style.display = 'flex';
             fill.style.width = '0%';
             setTimeout(() => { fill.style.transitionDuration = '3s'; fill.style.width = '100%'; }, 50);
-            storyTimer = setTimeout(closeStory, 3050);
-        }
-
-        function closeStory() {
-            document.getElementById('story-viewer').style.display = 'none';
-            document.getElementById('prog-fill').style.transitionDuration = '0s';
-            clearTimeout(storyTimer);
+            storyTimer = setTimeout(() => viewer.style.display = 'none', 3050);
         }
 
         window.onload = initApp;
