@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram AI Edition</title>
+    <title>Instagram Video Edition</title>
     <style>
         :root {
             --bg: #ffffff;
@@ -26,12 +26,11 @@
             padding: 0 15px; background: #fff; position: sticky; top: 0; z-index: 1000;
         }
         .logo { font-size: 24px; font-weight: bold; font-style: italic; }
-        .header-icons { display: flex; gap: 20px; font-size: 22px; cursor: pointer; }
 
         /* Main Content */
-        #app-body { flex: 1; overflow-y: auto; padding-bottom: 60px; transition: all 0.3s; }
+        #app-body { flex: 1; overflow-y: auto; padding-bottom: 60px; }
 
-        /* Stories */
+        /* Stories Bar */
         .stories-bar {
             display: flex; padding: 15px 10px; gap: 15px; overflow-x: auto;
             border-bottom: 1px solid var(--border); scrollbar-width: none;
@@ -46,235 +45,167 @@
             width: 100%; height: 100%; border-radius: 50%; background-size: cover;
             background-position: center; border: 2px solid #fff;
         }
-        .username-label { font-size: 11px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* Feed Posts */
         .post { border-bottom: 1px solid var(--border); margin-bottom: 15px; }
         .post-header { padding: 12px; display: flex; align-items: center; }
         .mini-avatar { width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; background-size: cover; }
-        .post-user { font-weight: 600; font-size: 14px; }
-        .post-main-img { width: 100%; background-color: #efefef; }
-        .post-actions { padding: 12px; display: flex; gap: 15px; font-size: 24px; }
-        .action-btn { cursor: pointer; transition: transform 0.1s; }
-        .action-btn:active { transform: scale(1.2); }
-        .post-likes { padding: 0 12px; font-weight: 600; font-size: 14px; margin-bottom: 5px; }
-        .post-caption { padding: 0 12px 12px; font-size: 14px; line-height: 1.4; }
+        .post-img { width: 100%; }
 
-        /* Reels Section */
+        /* Reels View */
         .reels-view { background: #000; color: #fff; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
         .reel-card {
             height: calc(100vh - 60px); width: 100%; scroll-snap-align: start;
-            position: relative; display: flex; flex-direction: column; justify-content: flex-end;
-            background-size: cover; background-position: center;
+            position: relative; overflow: hidden;
         }
-        .reel-overlay { padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); z-index: 5; }
-        .reel-side {
-            position: absolute; right: 15px; bottom: 100px; display: flex;
-            flex-direction: column; gap: 20px; align-items: center; z-index: 10;
+        video.reel-video {
+            width: 100%; height: 100%; object-fit: cover;
         }
-        .side-icon { font-size: 28px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-        .side-icon span { font-size: 12px; margin-top: 5px; font-weight: bold; }
+        .reel-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8)); z-index: 5;
+        }
 
-        /* Messages View */
-        .messages-view { padding: 15px; }
-        .msg-item { display: flex; align-items: center; padding: 12px 0; cursor: pointer; }
-        .msg-item:active { background: #fafafa; }
-        .msg-avatar { width: 56px; height: 56px; border-radius: 50%; margin-right: 15px; background-size: cover; }
-        .msg-content h4 { font-size: 14px; margin-bottom: 3px; }
-        .msg-content p { font-size: 13px; color: var(--gray); }
+        /* Story Fullscreen Viewer */
+        #story-viewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 2000; display: none; flex-direction: column;
+        }
+        .story-progress {
+            display: flex; gap: 5px; padding: 10px; position: absolute; top: 0; width: 100%;
+        }
+        .progress-bar { height: 2px; background: rgba(255,255,255,0.3); flex: 1; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #fff; width: 0%; transition: width linear; }
+        .story-header { display: flex; align-items: center; padding: 20px 10px; color: #fff; z-index: 10; }
+        .story-content { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .story-content img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
-        /* Bottom Navigation */
+        /* Bottom Nav */
         nav.bottom-nav {
             position: fixed; bottom: 0; width: 100%; height: 60px;
             background: #fff; border-top: 1px solid var(--border);
             display: flex; justify-content: space-around; align-items: center; z-index: 1000;
         }
-        .nav-icon { font-size: 26px; cursor: pointer; color: var(--text); }
-        .nav-icon.active { color: var(--blue); }
-
+        .nav-icon { font-size: 26px; cursor: pointer; }
         .hidden { display: none; }
-        .liked { color: var(--heart) !important; }
     </style>
 </head>
 <body>
 
     <header id="main-header">
         <div class="logo">Instagram</div>
-        <div class="header-icons">
-            <span onclick="alert('Funcionalidade de Notificações em breve!')">❤️</span>
-            <span onclick="showSection('messages')">📩</span>
-        </div>
+        <div style="font-size: 22px; cursor: pointer;">📩</div>
     </header>
 
     <main id="app-body">
-        <!-- HOME SECTION -->
+        <!-- HOME -->
         <section id="sec-home">
-            <div class="stories-bar" id="stories-list">
-                <!-- Stories gerados dinamicamente -->
-            </div>
-            <div id="feed-list">
-                <!-- Posts gerados dinamicamente -->
-            </div>
+            <div class="stories-bar" id="stories-list"></div>
+            <div id="feed-list"></div>
         </section>
 
-        <!-- REELS SECTION -->
-        <section id="sec-reels" class="hidden reels-view">
-            <!-- Reels gerados dinamicamente -->
-        </section>
-
-        <!-- MESSAGES SECTION -->
-        <section id="sec-messages" class="hidden messages-view">
-            <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                <span onclick="showSection('home')" style="cursor:pointer; font-size: 24px; margin-right: 15px;">⬅️</span>
-                <h2>Mensagens</h2>
-            </div>
-            <div id="msg-list"></div>
-        </section>
+        <!-- REELS -->
+        <section id="sec-reels" class="hidden reels-view"></section>
     </main>
 
+    <!-- STORY VIEWER -->
+    <div id="story-viewer">
+        <div class="story-progress"><div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div></div>
+        <div class="story-header">
+            <div class="mini-avatar" id="story-user-img" style="width:40px; height:40px;"></div>
+            <strong id="story-username" style="margin-left:10px;"></strong>
+            <span style="margin-left:auto; cursor:pointer; font-size:24px;" onclick="closeStory()">×</span>
+        </div>
+        <div class="story-content">
+            <img id="story-img" src="">
+        </div>
+    </div>
+
     <nav class="bottom-nav">
-        <div class="nav-icon active" id="nav-home" onclick="showSection('home')">🏠</div>
-        <div class="nav-icon" onclick="alert('Explorar em breve!')">🔍</div>
-        <div class="nav-icon" id="nav-reels" onclick="showSection('reels')">🎞️</div>
-        <div class="nav-icon" onclick="alert('Câmera aberta!')">➕</div>
-        <div class="nav-icon" onclick="alert('Perfil de vitor_gabriel')">👤</div>
+        <div class="nav-icon" onclick="showSection('home')">🏠</div>
+        <div class="nav-icon" onclick="showSection('reels')">🎞️</div>
+        <div class="nav-icon">👤</div>
     </nav>
 
     <script>
-        // Dados Simulados com Imagens de IA (Unsplash Source)
         const users = [
-            { name: 'vitor_ai', img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop' },
-            { name: 'ana_dev', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop' },
-            { name: 'tech_guru', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
-            { name: 'luna_arts', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop' },
-            { name: 'marcos_photo', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop' }
+            { name: 'ana_travel', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=1000&fit=crop' },
+            { name: 'joao_tech', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=1000&fit=crop' },
+            { name: 'luna_arts', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=1000&fit=crop' }
         ];
 
-        const postsData = [
-            { user: users[1], content: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&h=600&fit=crop', caption: 'Focada no código hoje! 💻✨', likes: 1240 },
-            { user: users[2], content: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=600&fit=crop', caption: 'O setup dos sonhos está pronto. 🚀', likes: 850 }
+        const reelsVideos = [
+            'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4',
+            'https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-leaves-low-angle-shot-1579-large.mp4'
         ];
 
-        const reelsData = [
-            { user: users[3], bg: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&h=1000&fit=crop', caption: 'Nova pintura em progresso! 🎨', likes: '45K' },
-            { user: users[4], bg: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=1000&fit=crop', caption: 'A natureza é perfeita. 🏔️', likes: '12K' }
-        ];
-
-        // Lógica de Navegação
-        function showSection(section) {
-            const sections = ['home', 'reels', 'messages'];
-            sections.forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
-            document.getElementById('sec-' + section).classList.remove('hidden');
-
-            // Reset Nav Icons
-            document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
-            if (section !== 'messages') document.getElementById('nav-' + section).classList.add('active');
-
-            // Header Style
-            const header = document.getElementById('main-header');
-            if (section === 'reels') {
-                header.style.background = '#000'; header.style.color = '#fff'; header.style.border = 'none';
-            } else {
-                header.style.background = '#fff'; header.style.color = '#000'; header.style.borderBottom = '1px solid #dbdbdb';
-            }
-        }
-
-        // Renderizar Stories
-        function initStories() {
-            const list = document.getElementById('stories-list');
-            users.forEach(u => {
+        function initApp() {
+            // Stories
+            const sList = document.getElementById('stories-list');
+            users.forEach((u, i) => {
                 const div = document.createElement('div');
                 div.className = 'story-item';
-                div.innerHTML = `
-                    <div class="ring"><div class="avatar" style="background-image: url('${u.img}')"></div></div>
-                    <span class="username-label">${u.name}</span>
-                `;
-                list.appendChild(div);
+                div.onclick = () => openStory(i);
+                div.innerHTML = `<div class="ring"><div class="avatar" style="background-image:url('${u.img}')"></div></div><span>${u.name}</span>`;
+                sList.appendChild(div);
             });
-        }
 
-        // Renderizar Feed
-        function initFeed() {
-            const list = document.getElementById('feed-list');
-            postsData.forEach((p, index) => {
+            // Feed
+            const fList = document.getElementById('feed-list');
+            users.forEach(u => {
                 const div = document.createElement('div');
                 div.className = 'post';
-                div.innerHTML = `
-                    <div class="post-header">
-                        <div class="mini-avatar" style="background-image: url('${p.user.img}')"></div>
-                        <span class="post-user">${p.user.name}</span>
-                    </div>
-                    <img src="${p.content}" class="post-main-img" ondblclick="togglePostLike(this, ${index})">
-                    <div class="post-actions">
-                        <span class="action-btn" onclick="togglePostLike(this, ${index})">🤍</span>
-                        <span class="action-btn">💬</span>
-                        <span class="action-btn">✈️</span>
-                    </div>
-                    <div class="post-likes">${p.likes} curtidas</div>
-                    <div class="post-caption"><strong>${p.user.name}</strong> ${p.caption}</div>
-                `;
-                list.appendChild(div);
+                div.innerHTML = `<div class="post-header"><div class="mini-avatar" style="background-image:url('${u.img}')"></div><strong>${u.name}</strong></div>
+                                 <img src="${u.story}" class="post-img">`;
+                fList.appendChild(div);
             });
-        }
 
-        // Renderizar Reels
-        function initReels() {
-            const list = document.getElementById('sec-reels');
-            reelsData.forEach(r => {
+            // Reels
+            const rList = document.getElementById('sec-reels');
+            reelsVideos.forEach(v => {
                 const div = document.createElement('div');
                 div.className = 'reel-card';
-                div.style.backgroundImage = `url('${r.bg}')`;
-                div.innerHTML = `
-                    <div class="reel-side">
-                        <div class="side-icon" onclick="this.classList.toggle('liked')">🤍<span>${r.likes}</span></div>
-                        <div class="side-icon">💬<span>128</span></div>
-                        <div class="side-icon">✈️</div>
-                        <div class="side-icon">...</div>
-                    </div>
-                    <div class="reel-overlay">
-                        <div style="display:flex; align-items:center; margin-bottom:10px;">
-                            <div class="mini-avatar" style="background-image: url('${r.user.img}'); border: 1px solid #fff;"></div>
-                            <span style="font-weight:bold; margin-right:10px;">${r.user.name}</span>
-                            <button style="background:transparent; border:1px solid #fff; color:#fff; padding:2px 8px; border-radius:4px; font-size:12px;">Seguir</button>
-                        </div>
-                        <p style="font-size:14px;">${r.caption}</p>
-                    </div>
-                `;
-                list.appendChild(div);
+                div.innerHTML = `<video class="reel-video" src="${v}" loop muted autoplay></video>
+                                 <div class="reel-overlay"><strong>@reels_trend</strong><p>Confira esse vídeo incrível! 🔥</p></div>`;
+                rList.appendChild(div);
             });
         }
 
-        // Renderizar Mensagens
-        function initMessages() {
-            const list = document.getElementById('msg-list');
-            users.slice(1).forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'msg-item';
-                div.innerHTML = `
-                    <div class="msg-avatar" style="background-image: url('${u.img}')"></div>
-                    <div class="msg-content">
-                        <h4>${u.name}</h4>
-                        <p>Visto agora mesmo</p>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
+        function showSection(sec) {
+            document.getElementById('sec-home').classList.toggle('hidden', sec !== 'home');
+            document.getElementById('sec-reels').classList.toggle('hidden', sec !== 'reels');
+            document.getElementById('main-header').style.display = sec === 'reels' ? 'none' : 'flex';
         }
 
-        // Funções de Interação
-        function togglePostLike(btn, index) {
-            const heart = btn.tagName === 'IMG' ? btn.nextElementSibling.children[0] : btn;
-            heart.classList.toggle('liked');
-            heart.innerHTML = heart.classList.contains('liked') ? '❤️' : '🤍';
+        // Story Logic
+        let storyTimer;
+        function openStory(index) {
+            const viewer = document.getElementById('story-viewer');
+            const fill = document.getElementById('prog-fill');
+            const user = users[index];
+            
+            document.getElementById('story-username').innerText = user.name;
+            document.getElementById('story-user-img').style.backgroundImage = `url('${user.img}')`;
+            document.getElementById('story-img').src = user.story;
+            
+            viewer.style.display = 'flex';
+            fill.style.width = '0%';
+            
+            setTimeout(() => {
+                fill.style.transitionDuration = '3s';
+                fill.style.width = '100%';
+            }, 50);
+
+            storyTimer = setTimeout(closeStory, 3050);
         }
 
-        // Inicialização
-        window.onload = () => {
-            initStories();
-            initFeed();
-            initReels();
-            initMessages();
-        };
+        function closeStory() {
+            document.getElementById('story-viewer').style.display = 'none';
+            document.getElementById('prog-fill').style.transitionDuration = '0s';
+            clearTimeout(storyTimer);
+        }
+
+        window.onload = initApp;
     </script>
 </body>
 </html>
