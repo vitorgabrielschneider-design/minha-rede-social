@@ -3,363 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram Reels Clone</title>
+    <title>Instagram Pro Clone</title>
     <style>
-        /* Estilos CSS para o Instagram Reels */
         :root {
-            --white: #ffffff;
-            --black: #000000;
+            --bg: #ffffff;
+            --text: #262626;
+            --border: #dbdbdb;
+            --blue: #0095f6;
             --gray: #8e8e8e;
-            --heart: #ff3040;
+            --story-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
         }
 
-        body, html {
-            height: 100%;
-            background-color: var(--black);
-            overflow: hidden; /* Evita scroll lateral */
-        }
-
-        /* Container Principal - Reels Container */
-        .reels-container {
+        body {
+            background-color: var(--bg);
+            color: var(--text);
             height: 100vh;
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
-            position: relative;
-            scroll-snap-type: y mandatory;
-            overflow-y: scroll;
-            scrollbar-width: none; /* Firefox */
-        }
-
-        .reels-container::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
-
-        /* Cada Vídeo (Reel) */
-        .reel {
-            height: 100vh;
-            width: 100%;
-            position: relative;
-            scroll-snap-align: start;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%), #1a1a1a;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        /* Simulação de vídeo (Fundo colorido) */
-        .video-sim {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* Top Bar */
+        header {
+            height: 50px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            background: #fff;
+            z-index: 100;
+        }
+
+        .logo { font-weight: bold; font-size: 20px; }
+
+        /* Main Content Area */
+        #main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 60px; /* Space for bottom nav */
+        }
+
+        /* Stories Section */
+        .stories-container {
+            display: flex;
+            padding: 10px;
+            gap: 15px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            scrollbar-width: none;
+        }
+        .stories-container::-webkit-scrollbar { display: none; }
+
+        .story {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 70px;
+        }
+
+        .story-ring {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--story-gradient);
+            padding: 2px;
+            margin-bottom: 5px;
+        }
+
+        .story-avatar {
             width: 100%;
             height: 100%;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80px;
-            color: rgba(255,255,255,0.2);
-        }
-
-        /* Overlay de Conteúdo */
-        .reel-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px;
-            z-index: 10;
-            color: var(--white);
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
             border-radius: 50%;
             background: #eee;
-            margin-right: 10px;
-            border: 1px solid var(--white);
+            border: 2px solid #fff;
         }
 
-        .username {
-            font-weight: 600;
-            font-size: 14px;
-            margin-right: 10px;
-        }
+        .story-user { font-size: 11px; color: var(--text); }
 
-        .follow-btn {
-            background: transparent;
-            border: 1px solid var(--white);
-            color: var(--white);
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 12px;
-            font-weight: 600;
-        }
+        /* Feed Section */
+        .post { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+        .post-header { padding: 10px; display: flex; align-items: center; }
+        .post-avatar { width: 32px; height: 32px; border-radius: 50%; background: #eee; margin-right: 10px; }
+        .post-img { width: 100%; aspect-ratio: 1/1; background: #fafafa; display: flex; align-items: center; justify-content: center; font-size: 50px; }
+        .post-actions { padding: 10px; display: flex; gap: 15px; font-size: 24px; }
+        .post-info { padding: 0 10px 10px; font-size: 14px; }
 
-        .caption {
-            font-size: 14px;
-            margin-bottom: 15px;
-            line-height: 1.4;
-            max-width: 80%;
-        }
+        /* Reels Mode (Full Screen) */
+        .reels-mode { background: #000; color: #fff; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        .reels-mode .reel { height: calc(100vh - 50px); scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; font-size: 100px; }
+        .reels-mode .reel-info { position: absolute; bottom: 20px; left: 20px; z-index: 10; }
 
-        .audio-info {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-        }
+        /* Messages Section */
+        .messages-container { padding: 20px; }
+        .chat-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .chat-avatar { width: 50px; height: 50px; border-radius: 50%; background: #eee; margin-right: 15px; }
+        .chat-info h4 { font-size: 14px; }
+        .chat-info p { font-size: 13px; color: var(--gray); }
 
-        .audio-icon {
-            margin-right: 8px;
-        }
-
-        /* Barra Lateral de Ações */
-        .side-actions {
-            position: absolute;
-            right: 10px;
-            bottom: 80px;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            color: var(--white);
-        }
-
-        .action-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .icon {
-            font-size: 28px;
-            margin-bottom: 5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        .count {
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .liked .icon {
-            color: var(--heart);
-        }
-
-        /* Botão Flutuante para Criar (Simulação) */
-        .add-reel-btn {
+        /* Bottom Nav */
+        nav.bottom-nav {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            border-top: 1px solid var(--border);
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
             font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(5px);
         }
 
-        /* Modal Simples para Novo Post */
-        #postModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        .nav-item { cursor: pointer; color: var(--text); }
+        .nav-item.active { color: var(--blue); }
 
-        .modal-content {
-            background: #262626;
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            border-radius: 12px;
-            color: white;
-        }
-
-        textarea {
-            width: 100%;
-            background: #363636;
-            border: none;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            resize: none;
-        }
-
-        .publish-btn {
-            width: 100%;
-            background: #0095f6;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <button class="add-reel-btn" onclick="openModal()">+</button>
+    <header id="app-header">
+        <div class="logo">Instagram</div>
+        <div style="font-size: 20px; cursor: pointer;" onclick="showTab('messages')">📩</div>
+    </header>
 
-    <div class="reels-container" id="reelsContainer">
-        <!-- Os Reels serão carregados aqui -->
-    </div>
+    <div id="main-content">
+        <!-- TAB: HOME -->
+        <div id="tab-home">
+            <div class="stories-container">
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">Seu story</span></div>
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">ana_clara</span></div>
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">joao_dev</span></div>
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">marcos_99</span></div>
+                <div class="story"><div class="story-ring"><div class="story-avatar"></div></div><span class="story-user">bia_arts</span></div>
+            </div>
+            <div id="feed">
+                <!-- Posts will be here -->
+            </div>
+        </div>
 
-    <!-- Modal para criar post -->
-    <div id="postModal">
-        <div class="modal-content">
-            <h3>Novo Reel</h3>
-            <textarea id="postInput" placeholder="No que você está pensando?" rows="4"></textarea>
-            <button class="publish-btn" onclick="addReel()">Publicar</button>
-            <button style="background:transparent; color: #8e8e8e; border:none; margin-top:10px; cursor:pointer; width:100%;" onclick="closeModal()">Cancelar</button>
+        <!-- TAB: REELS -->
+        <div id="tab-reels" class="hidden reels-mode">
+            <div class="reel" style="background: #1a1a1a;">🎬</div>
+            <div class="reel" style="background: #2c3e50;">🔥</div>
+            <div class="reel" style="background: #8e44ad;">✨</div>
+        </div>
+
+        <!-- TAB: MESSAGES -->
+        <div id="tab-messages" class="hidden">
+            <div class="messages-container">
+                <h2 style="margin-bottom: 20px;">Mensagens</h2>
+                <div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><h4>Ana Clara</h4><p>Enviou uma mensagem agora</p></div></div>
+                <div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><h4>João Dev</h4><p>Visto há 2h</p></div></div>
+                <div class="chat-item"><div class="chat-avatar"></div><div class="chat-info"><h4>Bia Arts</h4><p>Olá! Tudo bem?</p></div></div>
+            </div>
         </div>
     </div>
 
-    <script>
-        const container = document.getElementById('reelsContainer');
-        const modal = document.getElementById('postModal');
-        const input = document.getElementById('postInput');
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="showTab('home')">🏠</div>
+        <div class="nav-item" onclick="alert('Explorar em breve!')">🔍</div>
+        <div class="nav-item" onclick="showTab('reels')">🎞️</div>
+        <div class="nav-item" onclick="alert('Loja em breve!')">🛍️</div>
+        <div class="nav-item" onclick="alert('Perfil em breve!')">👤</div>
+    </nav>
 
-        let reels = [
-            {
-                id: 1,
-                user: "manus_ai",
-                caption: "Transformando ideias em código em segundos! ✨ #reels #coding #ai",
-                likes: "12.5K",
-                comments: "342",
-                audio: "Áudio original - manus_ai",
-                color: "#2c3e50",
-                emoji: "🤖",
-                liked: false
-            },
-            {
-                id: 2,
-                user: "vitor_gabriel",
-                caption: "O futuro do design é agora. Confira esse novo layout estilo Reels! 🚀",
-                likes: "8.2K",
-                comments: "156",
-                audio: "Som de tendência - Viral",
-                color: "#8e44ad",
-                emoji: "✨",
-                liked: true
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.getElementById('tab-home').classList.add('hidden');
+            document.getElementById('tab-reels').classList.add('hidden');
+            document.getElementById('tab-messages').classList.add('hidden');
+            
+            // Show selected tab
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+            // Handle header and background
+            const header = document.getElementById('app-header');
+            const content = document.getElementById('main-content');
+            
+            if (tabName === 'reels') {
+                header.style.background = '#000';
+                header.style.color = '#fff';
+                header.style.borderBottom = 'none';
+                content.style.background = '#000';
+            } else {
+                header.style.background = '#fff';
+                header.style.color = '#000';
+                header.style.borderBottom = '1px solid #dbdbdb';
+                content.style.background = '#fff';
             }
+
+            // Update Nav Active State
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            // (Simple logic: just visual feedback for the demo)
+        }
+
+        // Render Initial Feed
+        const feed = document.getElementById('feed');
+        const posts = [
+            { user: 'ana_clara', emoji: '📸', caption: 'Dia incrível na praia! ☀️' },
+            { user: 'joao_dev', emoji: '💻', caption: 'Codando o dia todo... ☕' }
         ];
 
-        function renderReels() {
-            container.innerHTML = '';
-            reels.forEach(reel => {
-                const reelDiv = document.createElement('div');
-                reelDiv.className = 'reel';
-                reelDiv.style.backgroundColor = reel.color;
-                
-                reelDiv.innerHTML = `
-                    <div class="video-sim">${reel.emoji}</div>
-                    
-                    <div class="side-actions">
-                        <div class="action-item ${reel.liked ? 'liked' : ''}" onclick="toggleLike(${reel.id})">
-                            <span class="icon">${reel.liked ? '❤️' : '🤍'}</span>
-                            <span class="count">${reel.likes}</span>
-                        </div>
-                        <div class="action-item">
-                            <span class="icon">💬</span>
-                            <span class="count">${reel.comments}</span>
-                        </div>
-                        <div class="action-item">
-                            <span class="icon">✈️</span>
-                        </div>
-                        <div class="action-item">
-                            <span class="icon">...</span>
-                        </div>
-                    </div>
-
-                    <div class="reel-overlay">
-                        <div class="user-info">
-                            <div class="avatar"></div>
-                            <span class="username">${reel.user}</span>
-                            <button class="follow-btn">Seguir</button>
-                        </div>
-                        <div class="caption">${reel.caption}</div>
-                        <div class="audio-info">
-                            <span class="audio-icon">🎵</span>
-                            <span>${reel.audio}</span>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(reelDiv);
-            });
-        }
-
-        function toggleLike(id) {
-            reels = reels.map(r => {
-                if (r.id === id) {
-                    return { ...r, liked: !r.liked };
-                }
-                return r;
-            });
-            renderReels();
-        }
-
-        function openModal() { modal.style.display = 'flex'; }
-        function closeModal() { modal.style.display = 'none'; }
-
-        function addReel() {
-            const text = input.value.trim();
-            if (!text) return;
-
-            const colors = ['#e67e22', '#27ae60', '#2980b9', '#f1c40f', '#c0392b'];
-            const emojis = ['🌟', '🔥', '🎨', '📸', '⚡'];
-
-            const newReel = {
-                id: Date.now(),
-                user: "vitor_gabriel",
-                caption: text,
-                likes: "0",
-                comments: "0",
-                audio: "Áudio original - vitor_gabriel",
-                color: colors[Math.floor(Math.random() * colors.length)],
-                emoji: emojis[Math.floor(Math.random() * emojis.length)],
-                liked: false
-            };
-
-            reels.unshift(newReel);
-            input.value = '';
-            closeModal();
-            renderReels();
-            container.scrollTop = 0;
-        }
-
-        renderReels();
+        posts.forEach(post => {
+            const div = document.createElement('div');
+            div.className = 'post';
+            div.innerHTML = `
+                <div class="post-header"><div class="post-avatar"></div><strong>${post.user}</strong></div>
+                <div class="post-img">${post.emoji}</div>
+                <div class="post-actions"><span>❤️</span><span>💬</span><span>✈️</span></div>
+                <div class="post-info"><strong>${post.user}</strong> ${post.caption}</div>
+            `;
+            feed.appendChild(div);
+        });
     </script>
 </body>
 </html>
