@@ -11,6 +11,7 @@
             --secondary-text: #8e8e8e;
             --border: #dbdbdb;
             --blue: #0095f6;
+            --red: #ed4956;
             --insta-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         }
 
@@ -18,14 +19,12 @@
 
         body { background-color: #fafafa; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
 
-        /* Container Mobile Simulation */
         .app-container {
             width: 100%; max-width: 450px; height: 100vh; background: var(--bg);
             display: flex; flex-direction: column; position: relative;
             border-left: 1px solid var(--border); border-right: 1px solid var(--border);
         }
 
-        /* Header */
         header {
             height: 60px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
@@ -34,16 +33,14 @@
         .logo { font-size: 24px; font-weight: bold; font-family: 'Arial Black', sans-serif; letter-spacing: -1px; }
         .header-icons { display: flex; gap: 20px; font-size: 22px; cursor: pointer; }
 
-        /* Main Content */
         main { flex: 1; overflow-y: auto; scrollbar-width: none; }
         main::-webkit-scrollbar { display: none; }
 
-        /* Sections */
         .section { display: none; animation: fadeIn 0.3s ease; }
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Stories */
+        /* Stories Bar */
         .stories-bar { display: flex; padding: 12px 8px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
         .stories-bar::-webkit-scrollbar { display: none; }
         .story-item { display: flex; flex-direction: column; align-items: center; min-width: 75px; cursor: pointer; }
@@ -53,66 +50,53 @@
             display: flex; justify-content: center; align-items: center;
         }
         .story-avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background-size: cover; background-position: center; }
-        .story-name { font-size: 11px; margin-top: 4px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%; text-align: center; }
+        .story-name { font-size: 11px; margin-top: 4px; color: var(--text); text-align: center; }
 
-        /* Feed Post */
+        /* Story Viewer */
+        #story-viewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 2000; display: none; flex-direction: column;
+        }
+        .story-header { position: absolute; top: 15px; left: 15px; display: flex; align-items: center; gap: 10px; color: #fff; z-index: 10; }
+        .story-progress { position: absolute; top: 5px; width: 96%; left: 2%; height: 2px; background: rgba(255,255,255,0.3); }
+        .story-progress-fill { height: 100%; background: #fff; width: 0%; transition: width linear; }
+        .story-content { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .story-content img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .story-footer { padding: 20px; display: flex; align-items: center; gap: 15px; }
+        .story-input { flex: 1; background: transparent; border: 1px solid #fff; border-radius: 20px; padding: 8px 15px; color: #fff; outline: none; }
+        .story-like-btn { font-size: 24px; color: #fff; cursor: pointer; transition: transform 0.2s; }
+        .story-like-btn.liked { color: var(--red); transform: scale(1.2); }
+
+        /* Post */
         .post { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
         .post-header { display: flex; align-items: center; justify-content: space-between; padding: 12px; }
         .post-user { display: flex; align-items: center; gap: 10px; }
         .post-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; }
         .post-username { font-size: 14px; font-weight: 600; }
-        .post-img-container { width: 100%; aspect-ratio: 1/1; background: #efefef; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .post-img-container { width: 100%; aspect-ratio: 1/1; background: #efefef; overflow: hidden; position: relative; }
         .post-img { width: 100%; height: 100%; object-fit: cover; }
         .post-actions { display: flex; padding: 12px; gap: 16px; font-size: 24px; }
+        .post-action-icon { cursor: pointer; transition: transform 0.1s; }
+        .post-action-icon:active { transform: scale(1.2); }
+        .liked { color: var(--red); }
         .post-likes { padding: 0 12px; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
         .post-caption { padding: 0 12px 12px; font-size: 14px; line-height: 1.4; }
-        .post-caption strong { margin-right: 6px; }
 
         /* Reels */
         .reels-container { height: 100%; background: #000; overflow-y: scroll; snap-type: y mandatory; }
-        .reel-item { height: calc(100vh - 50px); width: 100%; snap-align: start; position: relative; }
-        .reel-video-sim { width: 100%; height: 100%; background: #1a1a1a; display: flex; align-items: center; justify-content: center; font-size: 100px; }
+        .reel-item { height: 100%; width: 100%; snap-align: start; position: relative; }
+        .reel-video-sim { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 100px; }
         .reel-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: #fff; }
-        .reel-user { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .reel-actions-side { position: absolute; right: 10px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; color: #fff; align-items: center; }
-        .action-btn { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
-        .action-btn span { font-size: 12px; }
-
-        /* Profile */
-        .profile-header { padding: 20px 16px; display: flex; align-items: center; gap: 28px; }
-        .profile-pic { width: 80px; height: 80px; border-radius: 50%; background-size: cover; border: 1px solid var(--border); }
-        .profile-stats { flex: 1; display: flex; justify-content: space-around; text-align: center; }
-        .stat-num { font-weight: 600; font-size: 18px; }
-        .stat-label { font-size: 13px; color: var(--secondary-text); }
-        .profile-bio { padding: 0 16px 20px; }
-        .profile-name { font-weight: 600; font-size: 14px; }
-        .profile-text { font-size: 14px; margin-top: 4px; }
-        .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-        .grid-item { aspect-ratio: 1/1; background: #efefef; background-size: cover; }
-
-        /* Chat */
-        .chat-list-item { display: flex; align-items: center; padding: 12px 16px; gap: 12px; cursor: pointer; }
-        .chat-list-item:active { background: #fafafa; }
-        .chat-info h4 { font-size: 14px; font-weight: 500; }
-        .chat-info p { font-size: 13px; color: var(--secondary-text); }
 
         /* Bottom Nav */
-        nav {
-            height: 50px; border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; align-items: center;
-            background: #fff; z-index: 100;
-        }
-        .nav-icon { font-size: 24px; cursor: pointer; color: var(--text); }
-        .nav-icon.active { color: #000; }
-
-        /* Utility */
-        .hidden { display: none; }
+        nav { height: 50px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; background: #fff; z-index: 100; }
+        .nav-icon { font-size: 24px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <!-- Header Principal -->
         <header id="app-header">
             <div class="logo">VTGUIA</div>
             <div class="header-icons">
@@ -122,190 +106,157 @@
         </header>
 
         <main id="main-content">
-            <!-- SEÇÃO: HOME -->
             <section id="sec-home" class="section active">
-                <div class="stories-bar" id="stories-container">
-                    <!-- Stories via JS -->
-                </div>
-                <div id="feed-container">
-                    <!-- Posts via JS -->
-                </div>
+                <div class="stories-bar" id="stories-container"></div>
+                <div id="feed-container"></div>
             </section>
 
-            <!-- SEÇÃO: REELS -->
             <section id="sec-reels" class="section">
-                <div class="reels-container" id="reels-container">
-                    <!-- Reels via JS -->
-                </div>
+                <div class="reels-container" id="reels-container"></div>
             </section>
 
-            <!-- SEÇÃO: CHAT -->
             <section id="sec-chat" class="section">
                 <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 20px;">
                     <span onclick="showSection('home')" style="cursor:pointer; font-size: 20px;">⬅️</span>
                     <h2 style="font-size: 18px;">Mensagens</h2>
                 </div>
-                <div id="chat-list">
-                    <!-- Chats via JS -->
-                </div>
+                <div id="chat-list" style="padding: 10px;"></div>
             </section>
 
-            <!-- SEÇÃO: PERFIL -->
             <section id="sec-profile" class="section">
-                <div class="profile-header">
-                    <div class="profile-pic" style="background-image: url('https://images.unsplash.com/photo-153571501da13a22ce55605e1a455d04?w=200')"></div>
-                    <div class="profile-stats">
-                        <div><div class="stat-num">12</div><div class="stat-label">posts</div></div>
-                        <div><div class="stat-num">850</div><div class="stat-label">seguidores</div></div>
-                        <div><div class="stat-num">432</div><div class="stat-label">seguindo</div></div>
-                    </div>
-                </div>
-                <div class="profile-bio">
-                    <div class="profile-name">Vitor Gabriel</div>
-                    <div class="profile-text">Criando o futuro com VTGUIA 🚀<br>Designer & Developer</div>
-                </div>
-                <div style="padding: 0 16px 16px; display: flex; gap: 8px;">
-                    <button style="flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: #efefef; font-weight: 600; cursor: pointer;">Editar Perfil</button>
-                    <button style="flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: #efefef; font-weight: 600; cursor: pointer;">Compartilhar</button>
-                </div>
-                <div class="profile-grid" id="profile-grid">
-                    <!-- Grid via JS -->
+                <!-- Profile content same as before -->
+                <div style="padding: 20px; text-align: center;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: #eee; margin: 0 auto 10px; background-image: url('https://images.unsplash.com/photo-153571501da13a22ce55605e1a455d04?w=200'); background-size: cover;"></div>
+                    <h3>Vitor Gabriel</h3>
+                    <p>VTGUIA Creator</p>
                 </div>
             </section>
         </main>
 
-        <!-- Navegação Inferior -->
         <nav>
             <div class="nav-icon" onclick="showSection('home')">🏠</div>
-            <div class="nav-icon" onclick="alert('Explorar em breve!')">🔍</div>
             <div class="nav-icon" onclick="showSection('reels')">🎞️</div>
-            <div class="nav-icon" onclick="alert('Loja em breve!')">🛍️</div>
             <div class="nav-icon" onclick="showSection('profile')">👤</div>
         </nav>
+    </div>
+
+    <!-- Story Viewer Modal -->
+    <div id="story-viewer">
+        <div class="story-progress"><div class="story-progress-fill" id="story-fill"></div></div>
+        <div class="story-header">
+            <div id="story-user-img" style="width:32px; height:32px; border-radius:50%; background-size:cover;"></div>
+            <strong id="story-user-name"></strong>
+            <span style="margin-left: auto; cursor: pointer; font-size: 20px;" onclick="closeStory()">✕</span>
+        </div>
+        <div class="story-content">
+            <img id="story-img" src="">
+        </div>
+        <div class="story-footer">
+            <input type="text" class="story-input" placeholder="Enviar mensagem...">
+            <span class="story-like-btn" id="story-like-icon" onclick="toggleStoryLike()">❤️</span>
+        </div>
     </div>
 
     <script>
         const data = {
             users: [
-                { name: 'ana_clara', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', post: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600', caption: 'Saudades desse paraíso! 🌴✨' },
-                { name: 'marcos_dev', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', post: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', caption: 'Setup atualizado. O que acharam? 💻🔥' },
-                { name: 'bia_arts', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150', post: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600', caption: 'Nova pintura finalizada. 🎨🖌️' },
-                { name: 'lucas_fit', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', post: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600', caption: 'Foco total no objetivo. 💪⚡' }
-            ],
-            reels: [
-                { user: 'trend_master', emoji: '🕺', color: '#ff4757', likes: '1.2M', caption: 'Nova dancinha viral! #trend' },
-                { user: 'vitor_gabriel', emoji: '🚀', color: '#2f3542', likes: '450K', caption: 'VTGUIA está chegando com tudo!' }
+                { id: 1, name: 'ana_clara', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', post: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600', caption: 'Paraíso! 🌴', likes: 123, liked: false, storyLiked: false },
+                { id: 2, name: 'marcos_dev', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', post: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', caption: 'Foco no código. 💻', likes: 85, liked: false, storyLiked: false }
             ]
         };
+
+        let currentStoryUser = null;
 
         function init() {
             renderStories();
             renderFeed();
-            renderReels();
-            renderChats();
-            renderProfileGrid();
         }
 
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById('sec-' + id).classList.add('active');
-            
-            // Ajuste de Header para Reels
-            const header = document.getElementById('app-header');
-            if (id === 'reels') {
-                header.style.display = 'none';
-            } else {
-                header.style.display = 'flex';
-            }
         }
 
         function renderStories() {
             const container = document.getElementById('stories-container');
-            container.innerHTML = `<div class="story-item">
-                <div class="story-ring" style="background: #dbdbdb;"><div class="story-avatar" style="background-image: url('https://images.unsplash.com/photo-153571501da13a22ce55605e1a455d04?w=150')"></div></div>
-                <span class="story-name">Seu story</span>
-            </div>`;
+            container.innerHTML = '';
             data.users.forEach(u => {
-                container.innerHTML += `
-                    <div class="story-item">
-                        <div class="story-ring"><div class="story-avatar" style="background-image: url('${u.img}')"></div></div>
-                        <span class="story-name">${u.name}</span>
-                    </div>
+                const div = document.createElement('div');
+                div.className = 'story-item';
+                div.onclick = () => openStory(u);
+                div.innerHTML = `
+                    <div class="story-ring"><div class="story-avatar" style="background-image: url('${u.img}')"></div></div>
+                    <span class="story-name">${u.name}</span>
                 `;
+                container.appendChild(div);
             });
+        }
+
+        function openStory(user) {
+            currentStoryUser = user;
+            const viewer = document.getElementById('story-viewer');
+            const fill = document.getElementById('story-fill');
+            const likeIcon = document.getElementById('story-like-icon');
+            
+            document.getElementById('story-user-img').style.backgroundImage = `url(${user.img})`;
+            document.getElementById('story-user-name').innerText = user.name;
+            document.getElementById('story-img').src = user.post;
+            
+            likeIcon.className = user.storyLiked ? 'story-like-btn liked' : 'story-like-btn';
+            
+            viewer.style.display = 'flex';
+            fill.style.width = '0%';
+            setTimeout(() => { fill.style.transition = 'width 3s linear'; fill.style.width = '100%'; }, 50);
+            
+            window.storyTimeout = setTimeout(closeStory, 3050);
+        }
+
+        function closeStory() {
+            document.getElementById('story-viewer').style.display = 'none';
+            document.getElementById('story-fill').style.transition = 'none';
+            clearTimeout(window.storyTimeout);
+        }
+
+        function toggleStoryLike() {
+            currentStoryUser.storyLiked = !currentStoryUser.storyLiked;
+            const likeIcon = document.getElementById('story-like-icon');
+            likeIcon.className = currentStoryUser.storyLiked ? 'story-like-btn liked' : 'story-like-btn';
         }
 
         function renderFeed() {
             const container = document.getElementById('feed-container');
+            container.innerHTML = '';
             data.users.forEach(u => {
-                container.innerHTML += `
-                    <div class="post">
-                        <div class="post-header">
-                            <div class="post-user">
-                                <div class="post-avatar" style="background-image: url('${u.img}')"></div>
-                                <span class="post-username">${u.name}</span>
-                            </div>
-                            <span>•••</span>
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                postDiv.innerHTML = `
+                    <div class="post-header">
+                        <div class="post-user">
+                            <div class="post-avatar" style="background-image: url('${u.img}')"></div>
+                            <span class="post-username">${u.name}</span>
                         </div>
-                        <div class="post-img-container">
-                            <img src="${u.post}" class="post-img">
-                        </div>
-                        <div class="post-actions">
-                            <span>❤️</span> <span>💬</span> <span>✈️</span>
-                        </div>
-                        <div class="post-likes">1.234 curtidas</div>
-                        <div class="post-caption">
-                            <strong>${u.name}</strong> ${u.caption}
-                        </div>
+                        <span>•••</span>
                     </div>
+                    <div class="post-img-container" ondblclick="likePost(${u.id})">
+                        <img src="${u.post}" class="post-img">
+                    </div>
+                    <div class="post-actions">
+                        <span class="post-action-icon ${u.liked ? 'liked' : ''}" onclick="likePost(${u.id})">${u.liked ? '❤️' : '🤍'}</span>
+                        <span class="post-action-icon">💬</span>
+                        <span class="post-action-icon">✈️</span>
+                    </div>
+                    <div class="post-likes" id="likes-${u.id}">${u.likes} curtidas</div>
+                    <div class="post-caption"><strong>${u.name}</strong> ${u.caption}</div>
                 `;
+                container.appendChild(postDiv);
             });
         }
 
-        function renderReels() {
-            const container = document.getElementById('reels-container');
-            data.reels.forEach(r => {
-                container.innerHTML += `
-                    <div class="reel-item">
-                        <div class="reel-video-sim" style="background-color: ${r.color}">${r.emoji}</div>
-                        <div class="reel-actions-side">
-                            <div class="action-btn">❤️<span>${r.likes}</span></div>
-                            <div class="action-btn">💬<span>1.2K</span></div>
-                            <div class="action-btn">✈️</div>
-                            <div class="action-btn">•••</div>
-                        </div>
-                        <div class="reel-overlay">
-                            <div class="reel-user">
-                                <div class="post-avatar" style="background-image: url('https://via.placeholder.com/50')"></div>
-                                <strong>${r.user}</strong> • <button style="background: transparent; border: 1px solid #fff; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Seguir</button>
-                            </div>
-                            <p>${r.caption}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderChats() {
-            const container = document.getElementById('chat-list');
-            data.users.forEach(u => {
-                container.innerHTML += `
-                    <div class="chat-list-item">
-                        <div class="post-avatar" style="width: 56px; height: 56px; background-image: url('${u.img}')"></div>
-                        <div class="chat-info">
-                            <h4>${u.name}</h4>
-                            <p>Visto há 2h</p>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderProfileGrid() {
-            const container = document.getElementById('profile-grid');
-            for(let i=0; i<12; i++) {
-                container.innerHTML += `<div class="grid-item" style="background-image: url('https://picsum.photos/300?random=${i}')"></div>`;
-            }
+        function likePost(id) {
+            const user = data.users.find(u => u.id === id);
+            user.liked = !user.liked;
+            user.likes += user.liked ? 1 : -1;
+            renderFeed();
         }
 
         window.onload = init;
