@@ -3,521 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VTGUIA | Professional Social Experience</title>
-    <!-- Lucide Icons for professional look -->
+    <title>VTGUIA | Official App</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
         :root {
             --primary: #0095f6;
             --bg: #ffffff;
-            --secondary-bg: #fafafa;
-            --text: #262626;
-            --text-secondary: #737373;
-            --border: #dbdbdb;
-            --error: #ed4956;
-            --gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            --radius: 12px;
-            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --secondary-bg: #f8f9fa;
+            --text: #1a1a1a;
+            --text-secondary: #6e6e6e;
+            --border: #efefef;
+            --insta-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            --safe-area-top: env(safe-area-inset-top);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            background-color: var(--secondary-bg); 
-            color: var(--text);
-            display: flex; justify-content: center; height: 100vh; overflow: hidden;
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: var(--text); display: flex; justify-content: center; height: 100vh; }
+
+        .app-container {
+            width: 100%; max-width: 430px; height: 100vh; background: var(--bg);
+            display: flex; flex-direction: column; position: relative; overflow: hidden;
         }
 
-        /* App Shell */
-        .app-shell {
-            width: 100%; max-width: 430px; height: 100vh;
-            background: var(--bg); position: relative;
-            display: flex; flex-direction: column;
-            box-shadow: 0 0 40px rgba(0,0,0,0.1);
-        }
-
-        /* Auth Layer */
-        #auth-overlay {
-            position: absolute; inset: 0; background: #fff; z-index: 1000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 40px; transition: opacity 0.5s ease;
-        }
-        .auth-card { width: 100%; text-align: center; }
-        .brand-logo { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 40px; }
-        .input-group { width: 100%; margin-bottom: 15px; text-align: left; }
-        .input-group label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; display: block; }
-        .custom-input { 
-            width: 100%; padding: 12px 16px; border: 1px solid var(--border); 
-            border-radius: 8px; background: var(--secondary-bg); font-size: 14px;
-            transition: border 0.2s; outline: none;
-        }
-        .custom-input:focus { border-color: var(--primary); }
-        .primary-btn { 
-            width: 100%; padding: 12px; background: var(--primary); color: #fff; 
-            border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
-            transition: opacity 0.2s; margin-top: 10px;
-        }
-        .primary-btn:active { opacity: 0.8; }
-
-        /* Navigation */
+        /* Header */
         header {
-            height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 100;
+            height: 60px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); background: #fff; z-index: 1000;
         }
-        .header-logo { font-size: 22px; font-weight: 800; letter-spacing: -1px; }
-        .header-actions { display: flex; gap: 18px; align-items: center; }
-        .icon-btn { cursor: pointer; color: var(--text); transition: transform 0.2s; display: flex; align-items: center; }
-        .icon-btn:hover { transform: scale(1.1); }
+        .logo { font-size: 24px; font-weight: 800; letter-spacing: -1.5px; background: var(--insta-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions { display: flex; gap: 20px; }
 
-        /* Main Viewport */
-        main { flex: 1; overflow-y: auto; scrollbar-width: none; background: var(--bg); }
-        main::-webkit-scrollbar { display: none; }
+        /* Navigation Views */
+        .view { display: none; height: 100%; overflow-y: auto; scrollbar-width: none; }
+        .view::-webkit-scrollbar { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Sections */
-        .view-section { display: none; min-height: 100%; }
-        .view-section.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* Stories Bar */
-        .stories-container { display: flex; gap: 15px; padding: 15px 20px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-        .story-node { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 72px; }
-        .story-ring { 
-            width: 68px; height: 68px; border-radius: 50%; padding: 2.5px;
-            background: var(--gradient); display: flex; align-items: center; justify-content: center;
-        }
-        .story-img-wrapper { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; overflow: hidden; }
-        .story-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-        .story-label { font-size: 11px; font-weight: 500; color: var(--text); max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        /* Stories - Compact Style */
+        .stories-strip { display: flex; gap: 12px; padding: 12px 16px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .story-circle { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 66px; cursor: pointer; }
+        .ring { width: 62px; height: 62px; border-radius: 50%; background: var(--insta-gradient); padding: 2px; display: flex; align-items: center; justify-content: center; }
+        .avatar-wrap { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; overflow: hidden; }
+        .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .story-name { font-size: 11px; font-weight: 500; color: var(--text-secondary); width: 60px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* Feed Post */
-        .post-card { border-bottom: 1px solid var(--border); margin-bottom: 8px; }
-        .post-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
-        .post-author { display: flex; align-items: center; gap: 10px; }
-        .author-avatar { width: 34px; height: 34px; border-radius: 50%; background: #eee; overflow: hidden; }
-        .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .author-name { font-size: 14px; font-weight: 600; }
-        .post-media { width: 100%; aspect-ratio: 1/1; background: #f0f0f0; overflow: hidden; position: relative; }
+        .post { border-bottom: 8px solid var(--secondary-bg); }
+        .post-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .mini-avatar { width: 32px; height: 32px; border-radius: 50%; background: #eee; overflow: hidden; }
+        .mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .username { font-size: 14px; font-weight: 600; }
+        .post-media { width: 100%; aspect-ratio: 1/1; background: #f0f0f0; overflow: hidden; }
         .post-media img { width: 100%; height: 100%; object-fit: cover; }
-        .post-controls { display: flex; padding: 12px 16px; gap: 16px; }
+        .post-actions { display: flex; padding: 12px 16px; gap: 18px; }
+        .action-icon { cursor: pointer; transition: transform 0.1s; }
+        .action-icon:active { transform: scale(1.2); }
         .post-details { padding: 0 16px 16px; font-size: 14px; }
-        .likes-count { font-weight: 700; margin-bottom: 6px; display: block; }
-        .caption-text strong { margin-right: 6px; }
+        .likes { font-weight: 700; margin-bottom: 4px; display: block; }
 
-        /* Reels */
-        .reels-feed { height: 100%; background: #000; overflow-y: scroll; snap-type: y mandatory; scrollbar-width: none; }
-        .reel-frame { height: 100%; width: 100%; snap-align: start; position: relative; }
-        .reel-video { width: 100%; height: 100%; object-fit: cover; }
-        .reel-info { position: absolute; bottom: 30px; left: 20px; color: #fff; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .reel-side-actions { position: absolute; right: 15px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; color: #fff; align-items: center; }
+        /* Chat System */
+        .chat-view { background: #fff; z-index: 2000; }
+        .chat-list-item { display: flex; align-items: center; padding: 12px 16px; gap: 12px; cursor: pointer; transition: background 0.2s; }
+        .chat-list-item:active { background: var(--secondary-bg); }
+        .chat-info { flex: 1; }
+        .chat-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+        .chat-info p { font-size: 13px; color: var(--text-secondary); }
 
-        /* Profile */
-        .profile-head { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
-        .profile-main { display: flex; align-items: center; gap: 30px; }
-        .profile-avatar-big { width: 86px; height: 86px; border-radius: 50%; overflow: hidden; border: 1px solid var(--border); }
-        .profile-avatar-big img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-metrics { flex: 1; display: flex; justify-content: space-around; text-align: center; }
-        .metric-val { font-weight: 700; font-size: 18px; }
-        .metric-label { font-size: 13px; color: var(--text-secondary); }
-        .profile-bio { font-size: 14px; line-height: 1.5; }
-        .profile-actions { display: flex; gap: 8px; padding: 0 20px 20px; }
-        .secondary-btn { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--secondary-bg); font-weight: 600; font-size: 13px; cursor: pointer; }
+        .chat-room { position: fixed; inset: 0; background: #fff; z-index: 3000; display: none; flex-direction: column; max-width: 430px; margin: 0 auto; }
+        .chat-room-header { height: 60px; padding: 0 16px; display: flex; align-items: center; border-bottom: 1px solid var(--border); gap: 15px; }
+        .messages-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .msg-bubble { padding: 10px 16px; border-radius: 20px; max-width: 75%; font-size: 14px; line-height: 1.4; }
+        .msg-sent { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
+        .msg-received { align-self: flex-start; background: var(--secondary-bg); color: var(--text); border-bottom-left-radius: 4px; }
+        .chat-input-bar { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 12px; align-items: center; }
+        .chat-input { flex: 1; background: var(--secondary-bg); border: none; padding: 10px 16px; border-radius: 20px; outline: none; font-size: 14px; }
 
-        /* Tab Bar */
-        .tab-bar {
-            height: 55px; border-top: 1px solid var(--border); background: #fff;
-            display: flex; justify-content: space-around; align-items: center;
-        }
-        .tab-item { cursor: pointer; color: var(--text-secondary); transition: color 0.2s; }
-        .tab-item.active { color: var(--text); }
+        /* Bottom Nav */
+        nav { height: 60px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; background: #fff; }
+        .nav-item { color: var(--text-secondary); cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .nav-item.active { color: var(--text); }
 
-        /* Modals */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
-            display: none; flex-direction: column;
-        }
-        #story-viewer { display: none; }
-        .story-progress-bar { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; z-index: 10; }
-        .progress-segment { height: 2px; background: rgba(255,255,255,0.3); flex: 1; border-radius: 10px; overflow: hidden; }
-        .progress-inner { height: 100%; background: #fff; width: 0%; }
-
+        /* Utility */
         .hidden { display: none !important; }
+        .red { color: #ed4956 !important; }
     </style>
 </head>
 <body>
 
-    <div class="app-shell">
-        <!-- Login Experience -->
-        <div id="auth-overlay">
-            <div class="auth-card">
-                <div class="brand-logo">VTGUIA</div>
-                <div class="input-group">
-                    <label>NOME DE USUÁRIO</label>
-                    <input type="text" id="user-login" class="custom-input" placeholder="Como quer ser chamado?">
-                </div>
-                <div class="input-group">
-                    <label>FOTO DE PERFIL</label>
-                    <input type="file" id="user-avatar-file" class="hidden" accept="image/*">
-                    <button onclick="document.getElementById('user-avatar-file').click()" class="secondary-btn" style="width:100%">Escolher Imagem</button>
-                </div>
-                <button onclick="handleAuth()" class="primary-btn">Entrar na Experiência</button>
-            </div>
-        </div>
-
-        <!-- Global Header -->
-        <header id="global-header">
-            <div class="header-logo">VTGUIA</div>
+    <div class="app-container">
+        <!-- Header -->
+        <header id="main-header">
+            <div class="logo">VTGUIA</div>
             <div class="header-actions">
-                <div class="icon-btn" onclick="openCreateModal()"><i data-lucide="plus-square"></i></div>
-                <div class="icon-btn"><i data-lucide="heart"></i></div>
-                <div class="icon-btn"><i data-lucide="message-circle"></i></div>
+                <i data-lucide="plus-square" class="action-icon" onclick="openPostModal()"></i>
+                <i data-lucide="message-circle" class="action-icon" onclick="switchView('chat')"></i>
             </div>
         </header>
 
-        <main id="app-viewport">
+        <!-- Main Content -->
+        <main id="viewport">
             <!-- HOME VIEW -->
-            <section id="view-home" class="view-section active">
-                <div class="stories-container" id="stories-feed">
-                    <!-- Stories will be injected -->
+            <section id="view-home" class="view active">
+                <div class="stories-strip" id="stories-bar">
+                    <!-- Compact Stories -->
                 </div>
-                <div id="posts-feed">
-                    <!-- Posts will be injected -->
+                <div id="feed">
+                    <!-- Feed Posts -->
                 </div>
             </section>
 
-            <!-- REELS VIEW -->
-            <section id="view-reels" class="view-section">
-                <div class="reels-feed" id="reels-feed">
-                    <!-- Reels will be injected -->
+            <!-- CHAT VIEW -->
+            <section id="view-chat" class="view">
+                <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px;">
+                    <i data-lucide="arrow-left" onclick="switchView('home')" style="cursor:pointer;"></i>
+                    <h2 style="font-size: 18px; font-weight: 700;">Mensagens</h2>
+                </div>
+                <div id="chat-list-container">
+                    <!-- Chats -->
                 </div>
             </section>
 
             <!-- PROFILE VIEW -->
-            <section id="view-profile" class="view-section">
-                <div class="profile-head">
-                    <div class="profile-main">
-                        <div class="profile-avatar-big"><img id="my-avatar-display" src=""></div>
-                        <div class="profile-metrics">
-                            <div><div class="metric-val" id="post-count">0</div><div class="metric-label">posts</div></div>
-                            <div><div class="metric-val">1.2k</div><div class="metric-label">seguidores</div></div>
-                            <div><div class="metric-val">450</div><div class="metric-label">seguindo</div></div>
+            <section id="view-profile" class="view">
+                <div style="padding: 24px 16px;">
+                    <div style="display: flex; align-items: center; gap: 30px; margin-bottom: 20px;">
+                        <div id="my-pic" style="width: 86px; height: 86px; border-radius: 50%; background: #eee; overflow: hidden; border: 1px solid var(--border);"></div>
+                        <div style="flex: 1; display: flex; justify-content: space-around; text-align: center;">
+                            <div><strong style="display:block; font-size:18px;">0</strong><span style="font-size:12px; color:var(--text-secondary);">posts</span></div>
+                            <div><strong style="display:block; font-size:18px;">1.2k</strong><span style="font-size:12px; color:var(--text-secondary);">seguidores</span></div>
+                            <div><strong style="display:block; font-size:18px;">450</strong><span style="font-size:12px; color:var(--text-secondary);">seguindo</span></div>
                         </div>
                     </div>
-                    <div class="profile-bio">
-                        <strong id="my-name-display"></strong>
-                        <p>Bem-vindo ao meu VTGUIA profissional. ✨</p>
-                    </div>
+                    <h3 id="my-name" style="font-size: 15px; font-weight: 700;">Vitor Gabriel</h3>
+                    <p style="font-size: 14px; color: var(--text-secondary); margin-top: 4px;">Bem-vindo ao VTGUIA Oficial 🚀</p>
                 </div>
-                <div class="profile-actions">
-                    <button class="secondary-btn">Editar Perfil</button>
-                    <button class="secondary-btn">Compartilhar</button>
-                </div>
-                <div class="profile-grid" id="my-posts-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px;"></div>
+                <div id="my-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;"></div>
             </section>
         </main>
 
-        <!-- Tab Navigation -->
-        <nav class="tab-bar">
-            <div class="tab-item active" onclick="switchView('home')"><i data-lucide="home"></i></div>
-            <div class="tab-item" onclick="switchView('reels')"><i data-lucide="clapperboard"></i></div>
-            <div class="tab-item" onclick="switchView('profile')"><i data-lucide="user"></i></div>
+        <!-- Navigation -->
+        <nav>
+            <div class="nav-item active" onclick="switchView('home')"><i data-lucide="home"></i></div>
+            <div class="nav-item" onclick="switchView('reels')"><i data-lucide="clapperboard"></i></div>
+            <div class="nav-item" onclick="switchView('profile')"><i data-lucide="user"></i></div>
         </nav>
 
-        <!-- Story Viewer Modal -->
-        <div id="story-viewer" class="modal-overlay">
-            <div class="story-progress-bar" id="story-prog-bar"></div>
-            <div class="story-header" style="border:none; background:transparent; color:#fff;">
-                <div class="story-author" style="display:flex; align-items:center; gap:10px;">
-                    <div class="author-avatar" style="width:32px; height:32px; border:1px solid #fff;"><img id="st-author-img" src=""></div>
-                    <span id="st-author-name" style="font-weight:600; font-size:14px;"></span>
-                </div>
-                <div class="icon-btn" onclick="closeStory()" style="color:#fff;"><i data-lucide="x"></i></div>
+        <!-- Chat Room (Modal) -->
+        <div id="chat-room" class="chat-room">
+            <div class="chat-room-header">
+                <i data-lucide="arrow-left" onclick="closeChatRoom()" style="cursor:pointer;"></i>
+                <div class="mini-avatar" id="room-avatar"></div>
+                <strong id="room-name"></strong>
             </div>
-            <div class="story-content" style="flex:1; display:flex; align-items:center; justify-content:center; position:relative;">
-                <div style="position:absolute; left:0; width:40%; height:100%;" onclick="storyNav(-1)"></div>
-                <div style="position:absolute; right:0; width:40%; height:100%;" onclick="storyNav(1)"></div>
-                <img id="st-media" style="max-width:100%; max-height:100%; object-fit:contain;" src="">
-            </div>
-            <div class="story-footer" style="padding:20px; display:flex; align-items:center; gap:15px;">
-                <input type="text" class="custom-input" style="background:transparent; border:1px solid #fff; color:#fff;" placeholder="Responder story...">
-                <div class="icon-btn" onclick="toggleStoryLike()" id="st-like-btn" style="color:#fff;"><i data-lucide="heart"></i></div>
+            <div class="messages-area" id="messages-area"></div>
+            <div class="chat-input-bar">
+                <input type="text" id="chat-input-field" class="chat-input" placeholder="Mensagem...">
+                <i data-lucide="send" class="action-icon" style="color:var(--primary);" onclick="sendMsg()"></i>
             </div>
         </div>
 
-        <!-- Create Post Modal -->
-        <div id="create-modal" class="modal-overlay" style="background:rgba(255,255,255,0.98); color:var(--text); padding:20px; justify-content:flex-start;">
-            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:30px;">
-                <span onclick="closeCreateModal()" style="cursor:pointer;"><i data-lucide="chevron-left"></i></span>
-                <strong style="font-size:16px;">Novo Post</strong>
-                <span onclick="publishNewPost()" style="color:var(--primary); font-weight:700; cursor:pointer;">Compartilhar</span>
-            </div>
-            <div style="width:100%; aspect-ratio:1/1; background:#f0f0f0; border-radius:12px; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:20px;">
-                <input type="file" id="post-file-input" class="hidden" accept="image/*" onchange="previewPost(this)">
-                <div id="post-preview-placeholder" onclick="document.getElementById('post-file-input').click()" style="text-align:center; cursor:pointer;">
-                    <i data-lucide="image" style="width:48px; height:48px; color:var(--text-secondary);"></i>
-                    <p style="color:var(--text-secondary); font-size:14px; margin-top:10px;">Toque para escolher foto</p>
-                </div>
-                <img id="post-preview-img" class="hidden" style="width:100%; height:100%; object-fit:cover;">
-            </div>
-            <textarea id="post-caption-input" class="custom-input" style="height:120px; resize:none;" placeholder="Escreva uma legenda profissional..."></textarea>
+        <!-- Auth (Simulated) -->
+        <div id="auth" style="position:fixed; inset:0; background:#fff; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px;">
+            <h1 class="logo" style="font-size:48px; margin-bottom:40px;">VTGUIA</h1>
+            <input type="text" id="login-name" style="width:100%; padding:14px; border:1px solid var(--border); border-radius:12px; margin-bottom:15px; outline:none;" placeholder="Nome de usuário">
+            <button onclick="doLogin()" style="width:100%; padding:14px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:700; cursor:pointer;">Entrar</button>
         </div>
     </div>
 
     <script>
-        // Initialize Lucide Icons
         lucide.createIcons();
 
-        let userState = { name: '', avatar: '', posts: [] };
-        let currentStoryUserIdx = 0;
-        let storyTimer = null;
-        let storyProgress = 0;
+        let me = { name: '', pic: 'https://ui-avatars.com/api/?background=random' };
+        let activeChatUser = null;
 
-        const mockData = {
-            stories: [
-                { id: 1, name: 'AI_Design_Studio', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400', liked: false },
-                { id: 2, name: 'Cyber_Tech_IA', img: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400', liked: false },
-                { id: 3, name: 'Lucas_Vitor', img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400', liked: false },
-                { id: 4, name: 'Future_Vibes', img: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400', liked: false }
-            ],
-            reels: [
-                { id: 1, user: 'digital_art_ai', video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-futuristic-city-4412-large.mp4', likes: '1.2M' },
-                { id: 2, user: 'nature_vibe_ai', video: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4', likes: '850K' }
-            ]
-        };
+        const users = [
+            { id: 1, name: 'Ana Clara', pic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', lastMsg: 'Tudo bem por aí?' },
+            { id: 2, name: 'Marcos Dev', pic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', lastMsg: 'O código está pronto!' },
+            { id: 3, name: 'IA Influencer', pic: 'https://images.unsplash.com/photo-1675426513824-7b7b9c7355ac?w=150', lastMsg: 'Vi seu post novo!' }
+        ];
 
-        function handleAuth() {
-            const nameInput = document.getElementById('user-login').value;
-            const fileInput = document.getElementById('user-avatar-file');
-            
-            if(!nameInput) return alert("Por favor, escolha um nome profissional.");
-
-            userState.name = nameInput;
-            if(fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    userState.avatar = e.target.result;
-                    finalizeAuth();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                userState.avatar = 'https://ui-avatars.com/api/?name=' + nameInput + '&background=random';
-                finalizeAuth();
-            }
+        function doLogin() {
+            const name = document.getElementById('login-name').value;
+            if(!name) return;
+            me.name = name;
+            document.getElementById('auth').style.display = 'none';
+            document.getElementById('my-name').innerText = name;
+            document.getElementById('my-pic').innerHTML = `<img src="${me.pic}&name=${name}">`;
+            init();
         }
 
-        function finalizeAuth() {
-            document.getElementById('auth-overlay').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('auth-overlay').style.display = 'none';
-                document.getElementById('my-avatar-display').src = userState.avatar;
-                document.getElementById('my-name-display').innerText = userState.name;
-                initApp();
-            }, 500);
-        }
-
-        function initApp() {
+        function init() {
             renderStories();
-            renderReels();
-            switchView('home');
+            renderFeed();
+            renderChatList();
         }
 
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.querySelector(`.tab-item[onclick*="${viewId}"]`).classList.add('active');
-            
-            document.getElementById('global-header').style.display = viewId === 'reels' ? 'none' : 'flex';
+        function switchView(view) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-' + view).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelector(`.nav-item[onclick*="${view}"]`).classList.add('active');
+            document.getElementById('main-header').style.display = (view === 'chat') ? 'none' : 'flex';
         }
 
         function renderStories() {
-            const container = document.getElementById('stories-feed');
-            container.innerHTML = `
-                <div class="story-node">
-                    <div class="story-ring" style="background:#eee;"><div class="story-img-wrapper"><img src="${userState.avatar}"></div></div>
-                    <span class="story-label">Seu story</span>
-                </div>
-            `;
-            mockData.stories.forEach((s, idx) => {
-                container.innerHTML += `
-                    <div class="story-node" onclick="openStory(${idx})">
-                        <div class="story-ring"><div class="story-img-wrapper"><img src="${s.img}"></div></div>
-                        <span class="story-label">${s.name}</span>
+            const bar = document.getElementById('stories-bar');
+            bar.innerHTML = `<div class="story-circle"><div class="ring" style="background:#eee;"><div class="avatar-wrap"><img src="${me.pic}&name=${me.name}"></div></div><span class="story-name">Seu story</span></div>`;
+            users.forEach(u => {
+                bar.innerHTML += `
+                    <div class="story-circle">
+                        <div class="ring"><div class="avatar-wrap"><img src="${u.pic}"></div></div>
+                        <span class="story-name">${u.name}</span>
                     </div>
                 `;
             });
         }
 
-        function openStory(idx) {
-            currentStoryUserIdx = idx;
-            document.getElementById('story-viewer').style.display = 'flex';
-            renderStorySegments();
-            loadStory(idx);
-        }
-
-        function renderStorySegments() {
-            const bar = document.getElementById('story-prog-bar');
-            bar.innerHTML = '';
-            mockData.stories.forEach((_, i) => {
-                bar.innerHTML += `<div class="progress-segment"><div class="progress-inner" id="prog-${i}" style="width:${i < currentStoryUserIdx ? '100%' : '0%'}"></div></div>`;
-            });
-        }
-
-        function loadStory(idx) {
-            clearInterval(storyTimer);
-            const s = mockData.stories[idx];
-            document.getElementById('st-author-img').src = s.img;
-            document.getElementById('st-author-name').innerText = s.name;
-            document.getElementById('st-media').src = s.img;
-            
-            const likeBtn = document.getElementById('st-like-btn');
-            likeBtn.style.color = s.liked ? 'var(--error)' : '#fff';
-            likeBtn.innerHTML = s.liked ? '<i data-lucide="heart" fill="currentColor"></i>' : '<i data-lucide="heart"></i>';
-            lucide.createIcons();
-
-            storyProgress = 0;
-            const currentFill = document.getElementById(`prog-${idx}`);
-            storyTimer = setInterval(() => {
-                storyProgress += 1;
-                currentFill.style.width = storyProgress + '%';
-                if(storyProgress >= 100) storyNav(1);
-            }, 40);
-        }
-
-        function storyNav(dir) {
-            if(dir === 1) {
-                if(currentStoryUserIdx < mockData.stories.length - 1) {
-                    currentStoryUserIdx++;
-                    renderStorySegments();
-                    loadStory(currentStoryUserIdx);
-                } else {
-                    closeStory();
-                }
-            } else {
-                if(currentStoryUserIdx > 0) {
-                    currentStoryUserIdx--;
-                    renderStorySegments();
-                    loadStory(currentStoryUserIdx);
-                } else {
-                    loadStory(0);
-                }
-            }
-        }
-
-        function closeStory() {
-            document.getElementById('story-viewer').style.display = 'none';
-            clearInterval(storyTimer);
-        }
-
-        function toggleStoryLike() {
-            const s = mockData.stories[currentStoryUserIdx];
-            s.liked = !s.liked;
-            loadStory(currentStoryUserIdx);
-        }
-
-        function renderReels() {
-            const container = document.getElementById('reels-feed');
-            mockData.reels.forEach(r => {
-                container.innerHTML += `
-                    <div class="reel-frame">
-                        <video class="reel-video" src="${r.video}" loop muted autoplay></video>
-                        <div class="reel-side-actions">
-                            <div class="icon-btn"><i data-lucide="heart"></i><span>${r.likes}</span></div>
-                            <div class="icon-btn"><i data-lucide="message-circle"></i><span>2k</span></div>
-                            <div class="icon-btn"><i data-lucide="send"></i></div>
-                        </div>
-                        <div class="reel-info">
-                            <strong>@${r.user}</strong>
-                            <p>Experiência digital imersiva #VTGUIA</p>
-                        </div>
-                    </div>
-                `;
-            });
-            lucide.createIcons();
-        }
-
-        function openCreateModal() { document.getElementById('create-modal').style.display = 'flex'; }
-        function closeCreateModal() { document.getElementById('create-modal').style.display = 'none'; }
-
-        function previewPost(input) {
-            if(input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementById('post-preview-placeholder').classList.add('hidden');
-                    const img = document.getElementById('post-preview-img');
-                    img.src = e.target.result;
-                    img.classList.remove('hidden');
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function publishNewPost() {
-            const img = document.getElementById('post-preview-img').src;
-            const caption = document.getElementById('post-caption-input').value;
-            if(!img || img.includes('placeholder')) return alert("Selecione uma imagem!");
-
-            const newPost = { img, caption, likes: 0, liked: false };
-            userState.posts.unshift(newPost);
-            
-            renderUserFeed();
-            renderUserGrid();
-            closeCreateModal();
-            
-            // Reset modal
-            document.getElementById('post-preview-img').classList.add('hidden');
-            document.getElementById('post-preview-placeholder').classList.remove('hidden');
-            document.getElementById('post-caption-input').value = '';
-            document.getElementById('post-count').innerText = userState.posts.length;
-        }
-
-        function renderUserFeed() {
-            const container = document.getElementById('posts-feed');
-            container.innerHTML = '';
-            userState.posts.forEach((p, idx) => {
-                container.innerHTML += `
-                    <div class="post-card">
-                        <div class="post-top">
-                            <div class="post-author">
-                                <div class="author-avatar"><img src="${userState.avatar}"></div>
-                                <span class="author-name">${userState.name}</span>
-                            </div>
+        function renderFeed() {
+            const feed = document.getElementById('feed');
+            users.forEach(u => {
+                feed.innerHTML += `
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="user-info"><div class="mini-avatar"><img src="${u.pic}"></div><span class="username">${u.name}</span></div>
                             <i data-lucide="more-horizontal"></i>
                         </div>
-                        <div class="post-media" ondblclick="likePost(${idx})"><img src="${p.img}"></div>
-                        <div class="post-controls">
-                            <div class="icon-btn" onclick="likePost(${idx})" style="color:${p.liked ? 'var(--error)' : 'inherit'}">
-                                <i data-lucide="heart" ${p.liked ? 'fill="currentColor"' : ''}></i>
-                            </div>
-                            <i data-lucide="message-circle"></i>
-                            <i data-lucide="send"></i>
+                        <div class="post-media"><img src="https://picsum.photos/600/600?random=${u.id}"></div>
+                        <div class="post-actions">
+                            <i data-lucide="heart" class="action-icon" onclick="this.classList.toggle('red')"></i>
+                            <i data-lucide="message-circle" class="action-icon"></i>
+                            <i data-lucide="send" class="action-icon"></i>
                         </div>
-                        <div class="post-details">
-                            <span class="likes-count">${p.likes} curtidas</span>
-                            <div class="caption-text"><strong>${userState.name}</strong>${p.caption}</div>
-                        </div>
+                        <div class="post-details"><strong class="likes">1.234 curtidas</strong><p><strong>${u.name}</strong> Nova atualização do VTGUIA! ✨</p></div>
                     </div>
                 `;
             });
             lucide.createIcons();
         }
 
-        function renderUserGrid() {
-            const container = document.getElementById('my-posts-grid');
-            container.innerHTML = '';
-            userState.posts.forEach(p => {
-                container.innerHTML += `<div style="aspect-ratio:1/1; overflow:hidden;"><img src="${p.img}" style="width:100%; height:100%; object-fit:cover;"></div>`;
+        function renderChatList() {
+            const container = document.getElementById('chat-list-container');
+            users.forEach(u => {
+                container.innerHTML += `
+                    <div class="chat-list-item" onclick="openChatRoom(${u.id})">
+                        <div class="mini-avatar" style="width:56px; height:56px;"><img src="${u.pic}"></div>
+                        <div class="chat-info">
+                            <h4>${u.name}</h4>
+                            <p>${u.lastMsg}</p>
+                        </div>
+                        <i data-lucide="camera" style="color:var(--text-secondary); width:20px;"></i>
+                    </div>
+                `;
             });
+            lucide.createIcons();
         }
 
-        function likePost(idx) {
-            const p = userState.posts[idx];
-            p.liked = !p.liked;
-            p.likes += p.liked ? 1 : -1;
-            renderUserFeed();
+        function openChatRoom(userId) {
+            const user = users.find(u => u.id === userId);
+            activeChatUser = user;
+            document.getElementById('room-name').innerText = user.name;
+            document.getElementById('room-avatar').innerHTML = `<img src="${user.pic}">`;
+            document.getElementById('chat-room').style.display = 'flex';
+            document.getElementById('messages-area').innerHTML = `<div class="msg-bubble msg-received">${user.lastMsg}</div>`;
+        }
+
+        function closeChatRoom() {
+            document.getElementById('chat-room').style.display = 'none';
+        }
+
+        function sendMsg() {
+            const input = document.getElementById('chat-input-field');
+            if(!input.value) return;
+            const area = document.getElementById('messages-area');
+            area.innerHTML += `<div class="msg-bubble msg-sent">${input.value}</div>`;
+            input.value = '';
+            area.scrollTop = area.scrollHeight;
         }
     </script>
 </body>
