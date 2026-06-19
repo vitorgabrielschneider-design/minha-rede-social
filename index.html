@@ -3,239 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VTGUIA - Full Experience</title>
+    <title>Instagram Reels Clone</title>
     <style>
+        /* Estilos CSS para o Instagram Reels */
         :root {
-            --bg: #fafafa;
-            --app-bg: #ffffff;
-            --text: #262626;
-            --border: #dbdbdb;
-            --blue: #0095f6;
+            --white: #ffffff;
+            --black: #000000;
             --gray: #8e8e8e;
-            --story-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --heart: #ff3040;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-
-        body { background-color: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-
-        .phone-container {
-            width: 375px; height: 667px; background-color: var(--app-bg);
-            border: 8px solid #333; border-radius: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            position: relative; display: flex; flex-direction: column; overflow: hidden;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        header {
-            height: 50px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; background: #fff; flex-shrink: 0; z-index: 10;
+        body, html {
+            height: 100%;
+            background-color: var(--black);
+            overflow: hidden; /* Evita scroll lateral */
         }
-        .logo { font-size: 20px; font-weight: bold; color: var(--text); }
 
-        #app-body { flex: 1; overflow-y: auto; position: relative; scrollbar-width: none; }
-        #app-body::-webkit-scrollbar { display: none; }
+        /* Container Principal - Reels Container */
+        .reels-container {
+            height: 100vh;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            position: relative;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            scrollbar-width: none; /* Firefox */
+        }
 
-        /* Sections */
-        .section { height: 100%; display: flex; flex-direction: column; }
-        .hidden { display: none !important; }
+        .reels-container::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
 
-        /* Stories & Feed */
-        .stories-bar { display: flex; padding: 10px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); }
-        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 65px; cursor: pointer; }
-        .ring { width: 56px; height: 56px; border-radius: 50%; background: var(--story-gradient); padding: 2px; }
-        .avatar { width: 100%; height: 100%; border-radius: 50%; background-size: cover; border: 2px solid #fff; }
-        .post { border-bottom: 1px solid var(--border); }
-        .post-header { padding: 8px 12px; display: flex; align-items: center; font-size: 13px; }
-        .mini-avatar { width: 28px; height: 28px; border-radius: 50%; margin-right: 8px; background-size: cover; }
-        .post-img { width: 100%; }
+        /* Cada Vídeo (Reel) */
+        .reel {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%), #1a1a1a;
+        }
 
-        /* Reels */
-        .reels-view { background: #000; height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .reel-card { height: 100%; width: 100%; scroll-snap-align: start; position: relative; }
-        video.reel-video { width: 100%; height: 100%; object-fit: cover; }
-        .reel-overlay { position: absolute; bottom: 20px; left: 15px; color: #fff; font-size: 13px; z-index: 5; }
+        /* Simulação de vídeo (Fundo colorido) */
+        .video-sim {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            color: rgba(255,255,255,0.2);
+        }
 
-        /* Chat */
-        .chat-list { padding: 10px; }
-        .chat-item { display: flex; align-items: center; padding: 10px; cursor: pointer; border-radius: 8px; }
-        .chat-item:active { background: #f0f0f0; }
-        .chat-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 100; display: flex; flex-direction: column; }
-        .chat-header { height: 50px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 15px; }
-        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { padding: 8px 12px; border-radius: 18px; max-width: 80%; font-size: 14px; }
-        .bubble.sent { background: var(--blue); color: #fff; align-self: flex-end; }
-        .bubble.received { background: #efefef; align-self: flex-start; }
-        .chat-input { padding: 10px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
-        .chat-input input { flex: 1; border: 1px solid var(--border); border-radius: 20px; padding: 8px 15px; outline: none; }
+        /* Overlay de Conteúdo */
+        .reel-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            z-index: 10;
+            color: var(--white);
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        }
 
-        /* Profile */
-        .profile-view { padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .profile-avatar-big { width: 100px; height: 100px; border-radius: 50%; background-size: cover; margin-bottom: 15px; border: 1px solid var(--border); cursor: pointer; }
-        .profile-name { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
-        .edit-form { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-        .edit-form input { padding: 10px; border: 1px solid var(--border); border-radius: 5px; }
-        .save-btn { background: var(--blue); color: #fff; border: none; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
 
-        /* Bottom Nav */
-        nav.bottom-nav { height: 50px; background: #fff; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; }
-        .nav-icon { font-size: 20px; cursor: pointer; }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #eee;
+            margin-right: 10px;
+            border: 1px solid var(--white);
+        }
 
-        /* Story Viewer */
-        #story-viewer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; display: none; flex-direction: column; }
-        .story-progress { display: flex; gap: 4px; padding: 8px; position: absolute; top: 0; width: 100%; }
-        .progress-bar { height: 2px; background: rgba(255,255,255,0.3); flex: 1; border-radius: 1px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #fff; width: 0%; transition: width linear; }
+        .username {
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .follow-btn {
+            background: transparent;
+            border: 1px solid var(--white);
+            color: var(--white);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .caption {
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            max-width: 80%;
+        }
+
+        .audio-info {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .audio-icon {
+            margin-right: 8px;
+        }
+
+        /* Barra Lateral de Ações */
+        .side-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 80px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            color: var(--white);
+        }
+
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .icon {
+            font-size: 28px;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .count {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .liked .icon {
+            color: var(--heart);
+        }
+
+        /* Botão Flutuante para Criar (Simulação) */
+        .add-reel-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Modal Simples para Novo Post */
+        #postModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #262626;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        textarea {
+            width: 100%;
+            background: #363636;
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            resize: none;
+        }
+
+        .publish-btn {
+            width: 100%;
+            background: #0095f6;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <div class="phone-container">
-        <header id="main-header">
-            <div class="logo">VTGUIA</div>
-            <div style="font-size: 18px; cursor: pointer;" onclick="showSection('chat')">📩</div>
-        </header>
+    <button class="add-reel-btn" onclick="openModal()">+</button>
 
-        <main id="app-body">
-            <!-- HOME -->
-            <section id="sec-home" class="section">
-                <div class="stories-bar" id="stories-list"></div>
-                <div id="feed-list" style="overflow-y: auto;"></div>
-            </section>
+    <div class="reels-container" id="reelsContainer">
+        <!-- Os Reels serão carregados aqui -->
+    </div>
 
-            <!-- REELS -->
-            <section id="sec-reels" class="section hidden reels-view">
-                <div class="reel-card"><video class="reel-video" src="https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-12859-large.mp4" loop muted autoplay></video><div class="reel-overlay"><strong>@cyber_vibe</strong><p>Neon nights ⚡</p></div></div>
-                <div class="reel-card"><video class="reel-video" src="https://assets.mixkit.co/videos/preview/mixkit-tree-with-yellow-leaves-low-angle-shot-1579-large.mp4" loop muted autoplay></video><div class="reel-overlay"><strong>@nature_vt</strong><p>Outono mágico 🍂</p></div></div>
-            </section>
-
-            <!-- CHAT LIST -->
-            <section id="sec-chat" class="section hidden">
-                <div class="chat-header"><span onclick="showSection('home')" style="cursor:pointer; margin-right:15px;">⬅️</span><strong>Mensagens</strong></div>
-                <div class="chat-list" id="chat-list"></div>
-                <!-- Chat Screen (Nested) -->
-                <div id="chat-screen" class="chat-screen hidden">
-                    <div class="chat-header"><span onclick="closeChat()" style="cursor:pointer; margin-right:15px;">⬅️</span><strong id="chat-user-title"></strong></div>
-                    <div class="chat-messages" id="chat-msgs"></div>
-                    <div class="chat-input"><input type="text" id="msg-input" placeholder="Mensagem..."><button onclick="sendMessage()" style="border:none; background:none; color:var(--blue); font-weight:bold;">Enviar</button></div>
-                </div>
-            </section>
-
-            <!-- PROFILE -->
-            <section id="sec-profile" class="section hidden profile-view">
-                <div class="profile-avatar-big" id="my-avatar" style="background-image: url('https://images.unsplash.com/photo-153571501da13a22ce55605e1a455d04?w=200&h=200&fit=crop')"></div>
-                <div class="profile-name" id="my-name-display">Vitor Gabriel</div>
-                <div class="edit-form">
-                    <input type="text" id="edit-name" placeholder="Novo nome">
-                    <input type="text" id="edit-photo" placeholder="URL da foto">
-                    <button class="save-btn" onclick="saveProfile()">Salvar Alterações</button>
-                </div>
-            </section>
-
-            <!-- STORY VIEWER -->
-            <div id="story-viewer">
-                <div class="story-progress"><div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div></div>
-                <div class="story-content"><img id="story-img" src=""></div>
-            </div>
-        </main>
-
-        <nav class="bottom-nav">
-            <div class="nav-icon" onclick="showSection('home')">🏠</div>
-            <div class="nav-icon" onclick="showSection('reels')">🎞️</div>
-            <div class="nav-icon" onclick="showSection('profile')">👤</div>
-        </nav>
+    <!-- Modal para criar post -->
+    <div id="postModal">
+        <div class="modal-content">
+            <h3>Novo Reel</h3>
+            <textarea id="postInput" placeholder="No que você está pensando?" rows="4"></textarea>
+            <button class="publish-btn" onclick="addReel()">Publicar</button>
+            <button style="background:transparent; color: #8e8e8e; border:none; margin-top:10px; cursor:pointer; width:100%;" onclick="closeModal()">Cancelar</button>
+        </div>
     </div>
 
     <script>
-        const users = [
-            { name: 'ana_travel', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=1000&fit=crop' },
-            { name: 'joao_tech', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop', story: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=1000&fit=crop' }
+        const container = document.getElementById('reelsContainer');
+        const modal = document.getElementById('postModal');
+        const input = document.getElementById('postInput');
+
+        let reels = [
+            {
+                id: 1,
+                user: "manus_ai",
+                caption: "Transformando ideias em código em segundos! ✨ #reels #coding #ai",
+                likes: "12.5K",
+                comments: "342",
+                audio: "Áudio original - manus_ai",
+                color: "#2c3e50",
+                emoji: "🤖",
+                liked: false
+            },
+            {
+                id: 2,
+                user: "vitor_gabriel",
+                caption: "O futuro do design é agora. Confira esse novo layout estilo Reels! 🚀",
+                likes: "8.2K",
+                comments: "156",
+                audio: "Som de tendência - Viral",
+                color: "#8e44ad",
+                emoji: "✨",
+                liked: true
+            }
         ];
 
-        function initApp() {
-            // Render Stories
-            const sList = document.getElementById('stories-list');
-            users.forEach((u, i) => {
-                const div = document.createElement('div');
-                div.className = 'story-item';
-                div.onclick = () => openStory(i);
-                div.innerHTML = `<div class="ring"><div class="avatar" style="background-image:url('${u.img}')"></div></div><span>${u.name}</span>`;
-                sList.appendChild(div);
-            });
+        function renderReels() {
+            container.innerHTML = '';
+            reels.forEach(reel => {
+                const reelDiv = document.createElement('div');
+                reelDiv.className = 'reel';
+                reelDiv.style.backgroundColor = reel.color;
+                
+                reelDiv.innerHTML = `
+                    <div class="video-sim">${reel.emoji}</div>
+                    
+                    <div class="side-actions">
+                        <div class="action-item ${reel.liked ? 'liked' : ''}" onclick="toggleLike(${reel.id})">
+                            <span class="icon">${reel.liked ? '❤️' : '🤍'}</span>
+                            <span class="count">${reel.likes}</span>
+                        </div>
+                        <div class="action-item">
+                            <span class="icon">💬</span>
+                            <span class="count">${reel.comments}</span>
+                        </div>
+                        <div class="action-item">
+                            <span class="icon">✈️</span>
+                        </div>
+                        <div class="action-item">
+                            <span class="icon">...</span>
+                        </div>
+                    </div>
 
-            // Render Feed
-            const fList = document.getElementById('feed-list');
-            users.forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'post';
-                div.innerHTML = `<div class="post-header"><div class="mini-avatar" style="background-image:url('${u.img}')"></div><strong>${u.name}</strong></div>
-                                 <img src="${u.story}" class="post-img">`;
-                fList.appendChild(div);
-            });
-
-            // Render Chats
-            const cList = document.getElementById('chat-list');
-            users.forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'chat-item';
-                div.onclick = () => openChat(u.name);
-                div.innerHTML = `<div class="mini-avatar" style="background-image:url('${u.img}'); width:45px; height:45px;"></div>
-                                 <div><strong>${u.name}</strong><p style="font-size:12px; color:var(--gray);">Olá! Tudo bem?</p></div>`;
-                cList.appendChild(div);
+                    <div class="reel-overlay">
+                        <div class="user-info">
+                            <div class="avatar"></div>
+                            <span class="username">${reel.user}</span>
+                            <button class="follow-btn">Seguir</button>
+                        </div>
+                        <div class="caption">${reel.caption}</div>
+                        <div class="audio-info">
+                            <span class="audio-icon">🎵</span>
+                            <span>${reel.audio}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(reelDiv);
             });
         }
 
-        function showSection(sec) {
-            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('sec-' + sec).classList.remove('hidden');
-            document.getElementById('main-header').style.display = (sec === 'reels' || sec === 'chat') ? 'none' : 'flex';
+        function toggleLike(id) {
+            reels = reels.map(r => {
+                if (r.id === id) {
+                    return { ...r, liked: !r.liked };
+                }
+                return r;
+            });
+            renderReels();
         }
 
-        // Chat Logic
-        function openChat(name) {
-            document.getElementById('chat-user-title').innerText = name;
-            document.getElementById('chat-screen').classList.remove('hidden');
-            document.getElementById('chat-msgs').innerHTML = `<div class="bubble received">Oi! Vi suas fotos novas, ficaram ótimas!</div>`;
-        }
-        function closeChat() { document.getElementById('chat-screen').classList.add('hidden'); }
-        function sendMessage() {
-            const input = document.getElementById('msg-input');
-            if (!input.value) return;
-            const div = document.createElement('div');
-            div.className = 'bubble sent';
-            div.innerText = input.value;
-            document.getElementById('chat-msgs').appendChild(div);
+        function openModal() { modal.style.display = 'flex'; }
+        function closeModal() { modal.style.display = 'none'; }
+
+        function addReel() {
+            const text = input.value.trim();
+            if (!text) return;
+
+            const colors = ['#e67e22', '#27ae60', '#2980b9', '#f1c40f', '#c0392b'];
+            const emojis = ['🌟', '🔥', '🎨', '📸', '⚡'];
+
+            const newReel = {
+                id: Date.now(),
+                user: "vitor_gabriel",
+                caption: text,
+                likes: "0",
+                comments: "0",
+                audio: "Áudio original - vitor_gabriel",
+                color: colors[Math.floor(Math.random() * colors.length)],
+                emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                liked: false
+            };
+
+            reels.unshift(newReel);
             input.value = '';
-            document.getElementById('chat-msgs').scrollTop = document.getElementById('chat-msgs').scrollHeight;
+            closeModal();
+            renderReels();
+            container.scrollTop = 0;
         }
 
-        // Profile Logic
-        function saveProfile() {
-            const name = document.getElementById('edit-name').value;
-            const photo = document.getElementById('edit-photo').value;
-            if (name) {
-                document.getElementById('my-name-display').innerText = name;
-                document.getElementById('edit-name').value = '';
-            }
-            if (photo) {
-                document.getElementById('my-avatar').style.backgroundImage = `url('${photo}')`;
-                document.getElementById('edit-photo').value = '';
-            }
-            alert('Perfil atualizado!');
-        }
-
-        // Story Logic
-        let storyTimer;
-        function openStory(index) {
-            const viewer = document.getElementById('story-viewer');
-            const fill = document.getElementById('prog-fill');
-            document.getElementById('story-img').src = users[index].story;
-            viewer.style.display = 'flex';
-            fill.style.width = '0%';
-            setTimeout(() => { fill.style.transitionDuration = '3s'; fill.style.width = '100%'; }, 50);
-            storyTimer = setTimeout(() => viewer.style.display = 'none', 3050);
-        }
-
-        window.onload = initApp;
+        renderReels();
     </script>
 </body>
 </html>
