@@ -3,331 +3,521 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VTGUIA - Social AI</title>
+    <title>VTGUIA | Professional Social Experience</title>
+    <!-- Lucide Icons for professional look -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
         :root {
+            --primary: #0095f6;
             --bg: #ffffff;
+            --secondary-bg: #fafafa;
             --text: #262626;
-            --secondary-text: #8e8e8e;
+            --text-secondary: #737373;
             --border: #dbdbdb;
-            --blue: #0095f6;
-            --red: #ed4956;
-            --insta-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --error: #ed4956;
+            --gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
-        body { background-color: #fafafa; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
-
-        .app-container {
-            width: 100%; max-width: 450px; height: 100vh; background: var(--bg);
-            display: flex; flex-direction: column; position: relative;
-            border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background-color: var(--secondary-bg); 
+            color: var(--text);
+            display: flex; justify-content: center; height: 100vh; overflow: hidden;
         }
 
-        /* Auth Screen */
-        #auth-screen {
-            position: absolute; inset: 0; background: #fff; z-index: 5000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;
+        /* App Shell */
+        .app-shell {
+            width: 100%; max-width: 430px; height: 100vh;
+            background: var(--bg); position: relative;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
         }
-        .auth-input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 5px; background: #fafafa; }
-        .auth-btn { width: 100%; padding: 12px; background: var(--blue); color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
+        /* Auth Layer */
+        #auth-overlay {
+            position: absolute; inset: 0; background: #fff; z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 40px; transition: opacity 0.5s ease;
+        }
+        .auth-card { width: 100%; text-align: center; }
+        .brand-logo { font-size: 32px; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 40px; }
+        .input-group { width: 100%; margin-bottom: 15px; text-align: left; }
+        .input-group label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; display: block; }
+        .custom-input { 
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border); 
+            border-radius: 8px; background: var(--secondary-bg); font-size: 14px;
+            transition: border 0.2s; outline: none;
+        }
+        .custom-input:focus { border-color: var(--primary); }
+        .primary-btn { 
+            width: 100%; padding: 12px; background: var(--primary); color: #fff; 
+            border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+            transition: opacity 0.2s; margin-top: 10px;
+        }
+        .primary-btn:active { opacity: 0.8; }
+
+        /* Navigation */
         header {
-            height: 60px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 16px; background: #fff; z-index: 100;
+            height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 100;
         }
-        .logo { font-size: 24px; font-weight: bold; font-family: 'Arial Black', sans-serif; letter-spacing: -1px; }
+        .header-logo { font-size: 22px; font-weight: 800; letter-spacing: -1px; }
+        .header-actions { display: flex; gap: 18px; align-items: center; }
+        .icon-btn { cursor: pointer; color: var(--text); transition: transform 0.2s; display: flex; align-items: center; }
+        .icon-btn:hover { transform: scale(1.1); }
 
-        main { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; }
+        /* Main Viewport */
+        main { flex: 1; overflow-y: auto; scrollbar-width: none; background: var(--bg); }
         main::-webkit-scrollbar { display: none; }
 
-        .section { display: none; }
-        .section.active { display: block; }
+        /* Sections */
+        .view-section { display: none; min-height: 100%; }
+        .view-section.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         /* Stories Bar */
-        .stories-bar { display: flex; padding: 12px 8px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-        .story-item { display: flex; flex-direction: column; align-items: center; min-width: 75px; cursor: pointer; }
-        .story-ring { width: 66px; height: 66px; border-radius: 50%; background: var(--insta-gradient); padding: 2px; display: flex; justify-content: center; align-items: center; }
-        .story-avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background-size: cover; background-position: center; }
-        .story-name { font-size: 11px; margin-top: 4px; color: var(--text); }
-
-        /* Story Viewer */
-        #story-viewer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000; display: none; flex-direction: column;
+        .stories-container { display: flex; gap: 15px; padding: 15px 20px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .story-node { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; min-width: 72px; }
+        .story-ring { 
+            width: 68px; height: 68px; border-radius: 50%; padding: 2.5px;
+            background: var(--gradient); display: flex; align-items: center; justify-content: center;
         }
-        .story-progress-container { position: absolute; top: 10px; left: 0; width: 100%; display: flex; gap: 5px; padding: 0 10px; }
-        .story-progress-bar { height: 2px; background: rgba(255,255,255,0.3); flex: 1; border-radius: 1px; overflow: hidden; }
-        .story-progress-fill { height: 100%; background: #fff; width: 0%; }
-        
-        .story-header { position: absolute; top: 25px; left: 15px; display: flex; align-items: center; gap: 10px; color: #fff; z-index: 10; width: calc(100% - 30px); }
-        .story-header-user { display: flex; align-items: center; gap: 8px; flex: 1; }
-        .story-header-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; border: 1px solid rgba(255,255,255,0.2); }
-        
-        .story-content { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
-        .story-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
-        /* Touch areas for next/prev */
-        .story-touch { position: absolute; top: 0; height: 100%; width: 50%; z-index: 5; }
-        .story-touch-left { left: 0; }
-        .story-touch-right { right: 0; }
+        .story-img-wrapper { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; overflow: hidden; }
+        .story-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .story-label { font-size: 11px; font-weight: 500; color: var(--text); max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .story-footer { padding: 20px; display: flex; align-items: center; gap: 15px; background: linear-gradient(transparent, rgba(0,0,0,0.5)); position: absolute; bottom: 0; width: 100%; }
-        .story-input { flex: 1; background: transparent; border: 1px solid rgba(255,255,255,0.5); border-radius: 25px; padding: 10px 20px; color: #fff; outline: none; }
-        .story-like-btn { font-size: 28px; color: #fff; cursor: pointer; transition: transform 0.1s; }
-        .story-like-btn.liked { color: var(--red); transform: scale(1.1); }
-
-        /* Feed */
-        .post { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        .post-header { display: flex; align-items: center; padding: 12px; gap: 10px; }
-        .post-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; }
-        .post-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-        .post-actions { padding: 12px; display: flex; gap: 16px; font-size: 24px; }
+        /* Feed Post */
+        .post-card { border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+        .post-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+        .post-author { display: flex; align-items: center; gap: 10px; }
+        .author-avatar { width: 34px; height: 34px; border-radius: 50%; background: #eee; overflow: hidden; }
+        .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .author-name { font-size: 14px; font-weight: 600; }
+        .post-media { width: 100%; aspect-ratio: 1/1; background: #f0f0f0; overflow: hidden; position: relative; }
+        .post-media img { width: 100%; height: 100%; object-fit: cover; }
+        .post-controls { display: flex; padding: 12px 16px; gap: 16px; }
+        .post-details { padding: 0 16px 16px; font-size: 14px; }
+        .likes-count { font-weight: 700; margin-bottom: 6px; display: block; }
+        .caption-text strong { margin-right: 6px; }
 
         /* Reels */
-        .reels-container { height: 100%; background: #000; overflow-y: scroll; snap-type: y mandatory; }
-        .reel-item { height: 100%; width: 100%; snap-align: start; position: relative; }
+        .reels-feed { height: 100%; background: #000; overflow-y: scroll; snap-type: y mandatory; scrollbar-width: none; }
+        .reel-frame { height: 100%; width: 100%; snap-align: start; position: relative; }
         .reel-video { width: 100%; height: 100%; object-fit: cover; }
-        .reel-overlay { position: absolute; bottom: 20px; left: 15px; color: #fff; z-index: 5; }
+        .reel-info { position: absolute; bottom: 30px; left: 20px; color: #fff; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .reel-side-actions { position: absolute; right: 15px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; color: #fff; align-items: center; }
 
-        /* Nav */
-        nav { height: 50px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; background: #fff; }
-        .nav-icon { font-size: 24px; cursor: pointer; }
-        .hidden { display: none; }
+        /* Profile */
+        .profile-head { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; }
+        .profile-main { display: flex; align-items: center; gap: 30px; }
+        .profile-avatar-big { width: 86px; height: 86px; border-radius: 50%; overflow: hidden; border: 1px solid var(--border); }
+        .profile-avatar-big img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-metrics { flex: 1; display: flex; justify-content: space-around; text-align: center; }
+        .metric-val { font-weight: 700; font-size: 18px; }
+        .metric-label { font-size: 13px; color: var(--text-secondary); }
+        .profile-bio { font-size: 14px; line-height: 1.5; }
+        .profile-actions { display: flex; gap: 8px; padding: 0 20px 20px; }
+        .secondary-btn { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--secondary-bg); font-weight: 600; font-size: 13px; cursor: pointer; }
+
+        /* Tab Bar */
+        .tab-bar {
+            height: 55px; border-top: 1px solid var(--border); background: #fff;
+            display: flex; justify-content: space-around; align-items: center;
+        }
+        .tab-item { cursor: pointer; color: var(--text-secondary); transition: color 0.2s; }
+        .tab-item.active { color: var(--text); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+            display: none; flex-direction: column;
+        }
+        #story-viewer { display: none; }
+        .story-progress-bar { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; gap: 4px; z-index: 10; }
+        .progress-segment { height: 2px; background: rgba(255,255,255,0.3); flex: 1; border-radius: 10px; overflow: hidden; }
+        .progress-inner { height: 100%; background: #fff; width: 0%; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- Auth -->
-        <div id="auth-screen">
-            <h1 style="margin-bottom: 30px; font-family: 'Arial Black';">VTGUIA</h1>
-            <input type="text" id="username-input" class="auth-input" placeholder="Nome de usuário">
-            <input type="file" id="profile-upload" class="hidden" accept="image/*">
-            <button onclick="document.getElementById('profile-upload').click()" class="auth-btn" style="background: #eee; color: #333; margin-bottom: 10px;">Escolher Foto de Perfil</button>
-            <button onclick="login()" class="auth-btn">Entrar</button>
+    <div class="app-shell">
+        <!-- Login Experience -->
+        <div id="auth-overlay">
+            <div class="auth-card">
+                <div class="brand-logo">VTGUIA</div>
+                <div class="input-group">
+                    <label>NOME DE USUÁRIO</label>
+                    <input type="text" id="user-login" class="custom-input" placeholder="Como quer ser chamado?">
+                </div>
+                <div class="input-group">
+                    <label>FOTO DE PERFIL</label>
+                    <input type="file" id="user-avatar-file" class="hidden" accept="image/*">
+                    <button onclick="document.getElementById('user-avatar-file').click()" class="secondary-btn" style="width:100%">Escolher Imagem</button>
+                </div>
+                <button onclick="handleAuth()" class="primary-btn">Entrar na Experiência</button>
+            </div>
         </div>
 
-        <header>
-            <div class="logo">VTGUIA</div>
-            <div style="font-size: 24px; cursor: pointer;" onclick="openUpload()">➕</div>
+        <!-- Global Header -->
+        <header id="global-header">
+            <div class="header-logo">VTGUIA</div>
+            <div class="header-actions">
+                <div class="icon-btn" onclick="openCreateModal()"><i data-lucide="plus-square"></i></div>
+                <div class="icon-btn"><i data-lucide="heart"></i></div>
+                <div class="icon-btn"><i data-lucide="message-circle"></i></div>
+            </div>
         </header>
 
-        <main>
-            <section id="sec-home" class="section active">
-                <div class="stories-bar" id="stories-container"></div>
-                <div id="feed-container"></div>
-            </section>
-            <section id="sec-reels" class="section">
-                <div class="reels-container" id="reels-container"></div>
-            </section>
-            <section id="sec-profile" class="section">
-                <div style="padding: 20px; display: flex; align-items: center; gap: 20px;">
-                    <div id="my-profile-pic" style="width: 80px; height: 80px; border-radius: 50%; background-size: cover; border: 1px solid var(--border);"></div>
-                    <h3 id="display-username"></h3>
+        <main id="app-viewport">
+            <!-- HOME VIEW -->
+            <section id="view-home" class="view-section active">
+                <div class="stories-container" id="stories-feed">
+                    <!-- Stories will be injected -->
                 </div>
-                <div class="profile-grid" id="my-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;"></div>
+                <div id="posts-feed">
+                    <!-- Posts will be injected -->
+                </div>
+            </section>
+
+            <!-- REELS VIEW -->
+            <section id="view-reels" class="view-section">
+                <div class="reels-feed" id="reels-feed">
+                    <!-- Reels will be injected -->
+                </div>
+            </section>
+
+            <!-- PROFILE VIEW -->
+            <section id="view-profile" class="view-section">
+                <div class="profile-head">
+                    <div class="profile-main">
+                        <div class="profile-avatar-big"><img id="my-avatar-display" src=""></div>
+                        <div class="profile-metrics">
+                            <div><div class="metric-val" id="post-count">0</div><div class="metric-label">posts</div></div>
+                            <div><div class="metric-val">1.2k</div><div class="metric-label">seguidores</div></div>
+                            <div><div class="metric-val">450</div><div class="metric-label">seguindo</div></div>
+                        </div>
+                    </div>
+                    <div class="profile-bio">
+                        <strong id="my-name-display"></strong>
+                        <p>Bem-vindo ao meu VTGUIA profissional. ✨</p>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="secondary-btn">Editar Perfil</button>
+                    <button class="secondary-btn">Compartilhar</button>
+                </div>
+                <div class="profile-grid" id="my-posts-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px;"></div>
             </section>
         </main>
 
-        <nav>
-            <div onclick="showSection('home')" class="nav-icon">🏠</div>
-            <div onclick="showSection('reels')" class="nav-icon">🎞️</div>
-            <div onclick="showSection('profile')" class="nav-icon">👤</div>
+        <!-- Tab Navigation -->
+        <nav class="tab-bar">
+            <div class="tab-item active" onclick="switchView('home')"><i data-lucide="home"></i></div>
+            <div class="tab-item" onclick="switchView('reels')"><i data-lucide="clapperboard"></i></div>
+            <div class="tab-item" onclick="switchView('profile')"><i data-lucide="user"></i></div>
         </nav>
 
-        <!-- Story Viewer -->
-        <div id="story-viewer">
-            <div class="story-progress-container" id="story-progress-container"></div>
-            <div class="story-header">
-                <div class="story-header-user">
-                    <div class="story-header-avatar" id="story-header-avatar"></div>
-                    <strong id="story-header-name"></strong>
+        <!-- Story Viewer Modal -->
+        <div id="story-viewer" class="modal-overlay">
+            <div class="story-progress-bar" id="story-prog-bar"></div>
+            <div class="story-header" style="border:none; background:transparent; color:#fff;">
+                <div class="story-author" style="display:flex; align-items:center; gap:10px;">
+                    <div class="author-avatar" style="width:32px; height:32px; border:1px solid #fff;"><img id="st-author-img" src=""></div>
+                    <span id="st-author-name" style="font-weight:600; font-size:14px;"></span>
                 </div>
-                <span style="cursor: pointer; font-size: 24px;" onclick="closeStory()">✕</span>
+                <div class="icon-btn" onclick="closeStory()" style="color:#fff;"><i data-lucide="x"></i></div>
             </div>
-            <div class="story-content">
-                <div class="story-touch story-touch-left" onclick="prevStory()"></div>
-                <div class="story-touch story-touch-right" onclick="nextStory()"></div>
-                <img id="story-img" class="story-img" src="">
+            <div class="story-content" style="flex:1; display:flex; align-items:center; justify-content:center; position:relative;">
+                <div style="position:absolute; left:0; width:40%; height:100%;" onclick="storyNav(-1)"></div>
+                <div style="position:absolute; right:0; width:40%; height:100%;" onclick="storyNav(1)"></div>
+                <img id="st-media" style="max-width:100%; max-height:100%; object-fit:contain;" src="">
             </div>
-            <div class="story-footer">
-                <input type="text" class="story-input" placeholder="Enviar mensagem...">
-                <span class="story-like-btn" id="story-like-icon" onclick="toggleStoryLike()">❤️</span>
+            <div class="story-footer" style="padding:20px; display:flex; align-items:center; gap:15px;">
+                <input type="text" class="custom-input" style="background:transparent; border:1px solid #fff; color:#fff;" placeholder="Responder story...">
+                <div class="icon-btn" onclick="toggleStoryLike()" id="st-like-btn" style="color:#fff;"><i data-lucide="heart"></i></div>
             </div>
         </div>
 
-        <!-- Upload Modal -->
-        <div id="upload-modal" class="hidden" style="position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px;">
-            <div style="background: #fff; width: 100%; border-radius: 12px; padding: 20px;">
-                <h3>Novo Post</h3>
-                <input type="file" id="post-file" accept="image/*" style="margin: 20px 0;">
-                <textarea id="post-caption" class="auth-input" placeholder="Legenda..."></textarea>
-                <button onclick="publishPost()" class="auth-btn">Publicar</button>
-                <button onclick="closeUpload()" class="auth-btn" style="background: #eee; color: #333; margin-top: 10px;">Cancelar</button>
+        <!-- Create Post Modal -->
+        <div id="create-modal" class="modal-overlay" style="background:rgba(255,255,255,0.98); color:var(--text); padding:20px; justify-content:flex-start;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:30px;">
+                <span onclick="closeCreateModal()" style="cursor:pointer;"><i data-lucide="chevron-left"></i></span>
+                <strong style="font-size:16px;">Novo Post</strong>
+                <span onclick="publishNewPost()" style="color:var(--primary); font-weight:700; cursor:pointer;">Compartilhar</span>
             </div>
+            <div style="width:100%; aspect-ratio:1/1; background:#f0f0f0; border-radius:12px; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:20px;">
+                <input type="file" id="post-file-input" class="hidden" accept="image/*" onchange="previewPost(this)">
+                <div id="post-preview-placeholder" onclick="document.getElementById('post-file-input').click()" style="text-align:center; cursor:pointer;">
+                    <i data-lucide="image" style="width:48px; height:48px; color:var(--text-secondary);"></i>
+                    <p style="color:var(--text-secondary); font-size:14px; margin-top:10px;">Toque para escolher foto</p>
+                </div>
+                <img id="post-preview-img" class="hidden" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <textarea id="post-caption-input" class="custom-input" style="height:120px; resize:none;" placeholder="Escreva uma legenda profissional..."></textarea>
         </div>
     </div>
 
     <script>
-        let currentUser = { name: '', pic: '' };
-        let myPosts = [];
-        let currentStoryIndex = 0;
-        let storyInterval;
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        let userState = { name: '', avatar: '', posts: [] };
+        let currentStoryUserIdx = 0;
+        let storyTimer = null;
         let storyProgress = 0;
 
-        const storiesData = [
-            { name: 'IA_Artist', img: 'https://images.unsplash.com/photo-1675426513824-7b7b9c7355ac?w=400', liked: false },
-            { name: 'Cyber_Girl', img: 'https://images.unsplash.com/photo-1614728263952-84ea206f99b6?w=400', liked: false },
-            { name: 'Vitor_Design', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400', liked: false },
-            { name: 'Nature_IA', img: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400', liked: false }
-        ];
+        const mockData = {
+            stories: [
+                { id: 1, name: 'AI_Design_Studio', img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400', liked: false },
+                { id: 2, name: 'Cyber_Tech_IA', img: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=400', liked: false },
+                { id: 3, name: 'Lucas_Vitor', img: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400', liked: false },
+                { id: 4, name: 'Future_Vibes', img: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400', liked: false }
+            ],
+            reels: [
+                { id: 1, user: 'digital_art_ai', video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-futuristic-city-4412-large.mp4', likes: '1.2M' },
+                { id: 2, user: 'nature_vibe_ai', video: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4', likes: '850K' }
+            ]
+        };
 
-        function login() {
-            const name = document.getElementById('username-input').value;
-            const picInput = document.getElementById('profile-upload');
-            if (!name) return alert('Digite um nome!');
-            currentUser.name = name;
-            if (picInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (e) => { currentUser.pic = e.target.result; startApp(); };
-                reader.readAsDataURL(picInput.files[0]);
-            } else {
-                currentUser.pic = 'https://via.placeholder.com/150';
-                startApp();
-            }
-        }
-
-        function startApp() {
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('display-username').innerText = currentUser.name;
-            document.getElementById('my-profile-pic').style.backgroundImage = `url(${currentUser.pic})`;
-            renderStoriesBar();
-            renderReels();
-        }
-
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('sec-' + id).classList.add('active');
-        }
-
-        function renderStoriesBar() {
-            const container = document.getElementById('stories-container');
-            container.innerHTML = `<div class="story-item"><div class="story-ring" style="background:#eee"><div class="story-avatar" style="background-image:url(${currentUser.pic})"></div></div><span class="story-name">Seu story</span></div>`;
-            storiesData.forEach((s, index) => {
-                container.innerHTML += `<div class="story-item" onclick="openStory(${index})"><div class="story-ring"><div class="story-avatar" style="background-image:url(${s.img})"></div></div><span class="story-name">${s.name}</span></div>`;
-            });
-        }
-
-        function openStory(index) {
-            currentStoryIndex = index;
-            document.getElementById('story-viewer').style.display = 'flex';
-            renderStoryProgressBars();
-            loadStory(index);
-        }
-
-        function renderStoryProgressBars() {
-            const container = document.getElementById('story-progress-container');
-            container.innerHTML = '';
-            storiesData.forEach((_, i) => {
-                const bar = document.createElement('div');
-                bar.className = 'story-progress-bar';
-                bar.innerHTML = `<div class="story-progress-fill" id="fill-${i}" style="width: ${i < currentStoryIndex ? '100%' : '0%'}"></div>`;
-                container.appendChild(bar);
-            });
-        }
-
-        function loadStory(index) {
-            clearInterval(storyInterval);
-            const story = storiesData[index];
-            document.getElementById('story-header-avatar').style.backgroundImage = `url(${story.img})`;
-            document.getElementById('story-header-name').innerText = story.name;
-            document.getElementById('story-img').src = story.img;
-            document.getElementById('story-like-icon').className = story.liked ? 'story-like-btn liked' : 'story-like-btn';
+        function handleAuth() {
+            const nameInput = document.getElementById('user-login').value;
+            const fileInput = document.getElementById('user-avatar-file');
             
+            if(!nameInput) return alert("Por favor, escolha um nome profissional.");
+
+            userState.name = nameInput;
+            if(fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    userState.avatar = e.target.result;
+                    finalizeAuth();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                userState.avatar = 'https://ui-avatars.com/api/?name=' + nameInput + '&background=random';
+                finalizeAuth();
+            }
+        }
+
+        function finalizeAuth() {
+            document.getElementById('auth-overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('auth-overlay').style.display = 'none';
+                document.getElementById('my-avatar-display').src = userState.avatar;
+                document.getElementById('my-name-display').innerText = userState.name;
+                initApp();
+            }, 500);
+        }
+
+        function initApp() {
+            renderStories();
+            renderReels();
+            switchView('home');
+        }
+
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab-item[onclick*="${viewId}"]`).classList.add('active');
+            
+            document.getElementById('global-header').style.display = viewId === 'reels' ? 'none' : 'flex';
+        }
+
+        function renderStories() {
+            const container = document.getElementById('stories-feed');
+            container.innerHTML = `
+                <div class="story-node">
+                    <div class="story-ring" style="background:#eee;"><div class="story-img-wrapper"><img src="${userState.avatar}"></div></div>
+                    <span class="story-label">Seu story</span>
+                </div>
+            `;
+            mockData.stories.forEach((s, idx) => {
+                container.innerHTML += `
+                    <div class="story-node" onclick="openStory(${idx})">
+                        <div class="story-ring"><div class="story-img-wrapper"><img src="${s.img}"></div></div>
+                        <span class="story-label">${s.name}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function openStory(idx) {
+            currentStoryUserIdx = idx;
+            document.getElementById('story-viewer').style.display = 'flex';
+            renderStorySegments();
+            loadStory(idx);
+        }
+
+        function renderStorySegments() {
+            const bar = document.getElementById('story-prog-bar');
+            bar.innerHTML = '';
+            mockData.stories.forEach((_, i) => {
+                bar.innerHTML += `<div class="progress-segment"><div class="progress-inner" id="prog-${i}" style="width:${i < currentStoryUserIdx ? '100%' : '0%'}"></div></div>`;
+            });
+        }
+
+        function loadStory(idx) {
+            clearInterval(storyTimer);
+            const s = mockData.stories[idx];
+            document.getElementById('st-author-img').src = s.img;
+            document.getElementById('st-author-name').innerText = s.name;
+            document.getElementById('st-media').src = s.img;
+            
+            const likeBtn = document.getElementById('st-like-btn');
+            likeBtn.style.color = s.liked ? 'var(--error)' : '#fff';
+            likeBtn.innerHTML = s.liked ? '<i data-lucide="heart" fill="currentColor"></i>' : '<i data-lucide="heart"></i>';
+            lucide.createIcons();
+
             storyProgress = 0;
-            const fill = document.getElementById(`fill-${index}`);
-            storyInterval = setInterval(() => {
+            const currentFill = document.getElementById(`prog-${idx}`);
+            storyTimer = setInterval(() => {
                 storyProgress += 1;
-                fill.style.width = storyProgress + '%';
-                if (storyProgress >= 100) {
-                    nextStory();
+                currentFill.style.width = storyProgress + '%';
+                if(storyProgress >= 100) storyNav(1);
+            }, 40);
+        }
+
+        function storyNav(dir) {
+            if(dir === 1) {
+                if(currentStoryUserIdx < mockData.stories.length - 1) {
+                    currentStoryUserIdx++;
+                    renderStorySegments();
+                    loadStory(currentStoryUserIdx);
+                } else {
+                    closeStory();
                 }
-            }, 30); // 3 seconds total
-        }
-
-        function nextStory() {
-            if (currentStoryIndex < storiesData.length - 1) {
-                currentStoryIndex++;
-                renderStoryProgressBars();
-                loadStory(currentStoryIndex);
             } else {
-                closeStory();
+                if(currentStoryUserIdx > 0) {
+                    currentStoryUserIdx--;
+                    renderStorySegments();
+                    loadStory(currentStoryUserIdx);
+                } else {
+                    loadStory(0);
+                }
             }
-        }
-
-        function prevStory() {
-            if (currentStoryIndex > 0) {
-                currentStoryIndex--;
-                renderStoryProgressBars();
-                loadStory(currentStoryIndex);
-            } else {
-                loadStory(0);
-            }
-        }
-
-        function toggleStoryLike() {
-            const story = storiesData[currentStoryIndex];
-            story.liked = !story.liked;
-            document.getElementById('story-like-icon').className = story.liked ? 'story-like-btn liked' : 'story-like-btn';
         }
 
         function closeStory() {
             document.getElementById('story-viewer').style.display = 'none';
-            clearInterval(storyInterval);
+            clearInterval(storyTimer);
+        }
+
+        function toggleStoryLike() {
+            const s = mockData.stories[currentStoryUserIdx];
+            s.liked = !s.liked;
+            loadStory(currentStoryUserIdx);
         }
 
         function renderReels() {
-            const container = document.getElementById('reels-container');
-            const reels = [
-                { user: 'ai_future', video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-futuristic-city-4412-large.mp4' },
-                { user: 'cyber_nature', video: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
-            ];
-            reels.forEach(r => {
-                container.innerHTML += `<div class="reel-item"><video class="reel-video" src="${r.video}" loop muted autoplay></video><div class="reel-overlay"><strong>@${r.user}</strong><p>Gerado por IA ✨</p></div></div>`;
+            const container = document.getElementById('reels-feed');
+            mockData.reels.forEach(r => {
+                container.innerHTML += `
+                    <div class="reel-frame">
+                        <video class="reel-video" src="${r.video}" loop muted autoplay></video>
+                        <div class="reel-side-actions">
+                            <div class="icon-btn"><i data-lucide="heart"></i><span>${r.likes}</span></div>
+                            <div class="icon-btn"><i data-lucide="message-circle"></i><span>2k</span></div>
+                            <div class="icon-btn"><i data-lucide="send"></i></div>
+                        </div>
+                        <div class="reel-info">
+                            <strong>@${r.user}</strong>
+                            <p>Experiência digital imersiva #VTGUIA</p>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function openCreateModal() { document.getElementById('create-modal').style.display = 'flex'; }
+        function closeCreateModal() { document.getElementById('create-modal').style.display = 'none'; }
+
+        function previewPost(input) {
+            if(input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('post-preview-placeholder').classList.add('hidden');
+                    const img = document.getElementById('post-preview-img');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function publishNewPost() {
+            const img = document.getElementById('post-preview-img').src;
+            const caption = document.getElementById('post-caption-input').value;
+            if(!img || img.includes('placeholder')) return alert("Selecione uma imagem!");
+
+            const newPost = { img, caption, likes: 0, liked: false };
+            userState.posts.unshift(newPost);
+            
+            renderUserFeed();
+            renderUserGrid();
+            closeCreateModal();
+            
+            // Reset modal
+            document.getElementById('post-preview-img').classList.add('hidden');
+            document.getElementById('post-preview-placeholder').classList.remove('hidden');
+            document.getElementById('post-caption-input').value = '';
+            document.getElementById('post-count').innerText = userState.posts.length;
+        }
+
+        function renderUserFeed() {
+            const container = document.getElementById('posts-feed');
+            container.innerHTML = '';
+            userState.posts.forEach((p, idx) => {
+                container.innerHTML += `
+                    <div class="post-card">
+                        <div class="post-top">
+                            <div class="post-author">
+                                <div class="author-avatar"><img src="${userState.avatar}"></div>
+                                <span class="author-name">${userState.name}</span>
+                            </div>
+                            <i data-lucide="more-horizontal"></i>
+                        </div>
+                        <div class="post-media" ondblclick="likePost(${idx})"><img src="${p.img}"></div>
+                        <div class="post-controls">
+                            <div class="icon-btn" onclick="likePost(${idx})" style="color:${p.liked ? 'var(--error)' : 'inherit'}">
+                                <i data-lucide="heart" ${p.liked ? 'fill="currentColor"' : ''}></i>
+                            </div>
+                            <i data-lucide="message-circle"></i>
+                            <i data-lucide="send"></i>
+                        </div>
+                        <div class="post-details">
+                            <span class="likes-count">${p.likes} curtidas</span>
+                            <div class="caption-text"><strong>${userState.name}</strong>${p.caption}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        function renderUserGrid() {
+            const container = document.getElementById('my-posts-grid');
+            container.innerHTML = '';
+            userState.posts.forEach(p => {
+                container.innerHTML += `<div style="aspect-ratio:1/1; overflow:hidden;"><img src="${p.img}" style="width:100%; height:100%; object-fit:cover;"></div>`;
             });
         }
 
-        function openUpload() { document.getElementById('upload-modal').style.display = 'flex'; }
-        function closeUpload() { document.getElementById('upload-modal').style.display = 'none'; }
-        function publishPost() {
-            const fileInput = document.getElementById('post-file');
-            const caption = document.getElementById('post-caption').value;
-            if (!fileInput.files[0]) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                myPosts.unshift({ img: e.target.result, caption });
-                renderFeed();
-                renderProfileGrid();
-                closeUpload();
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-
-        function renderFeed() {
-            const container = document.getElementById('feed-container');
-            container.innerHTML = '';
-            myPosts.forEach(p => {
-                container.innerHTML += `<div class="post"><div class="post-header"><div class="post-avatar" style="background-image:url(${currentUser.pic})"></div><strong>${currentUser.name}</strong></div><img src="${p.img}" class="post-img"><div class="post-actions">❤️ 💬 ✈️</div><div style="padding:0 12px 12px"><strong>${currentUser.name}</strong> ${p.caption}</div></div>`;
-            });
-        }
-
-        function renderProfileGrid() {
-            const container = document.getElementById('my-grid');
-            container.innerHTML = '';
-            myPosts.forEach(p => { container.innerHTML += `<div style="aspect-ratio:1/1; background-image:url(${p.img}); background-size:cover; background-position:center;"></div>`; });
+        function likePost(idx) {
+            const p = userState.posts[idx];
+            p.liked = !p.liked;
+            p.likes += p.liked ? 1 : -1;
+            renderUserFeed();
         }
     </script>
 </body>
