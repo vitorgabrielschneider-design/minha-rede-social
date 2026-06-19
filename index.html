@@ -33,7 +33,6 @@
         .auth-input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 5px; background: #fafafa; }
         .auth-btn { width: 100%; padding: 12px; background: var(--blue); color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
 
-        /* Header */
         header {
             height: 60px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
@@ -41,21 +40,46 @@
         }
         .logo { font-size: 24px; font-weight: bold; font-family: 'Arial Black', sans-serif; letter-spacing: -1px; }
 
-        /* Main Content */
         main { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; }
         main::-webkit-scrollbar { display: none; }
 
         .section { display: none; }
         .section.active { display: block; }
 
-        /* Stories */
-        .stories-bar { display: flex; padding: 12px 8px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); }
+        /* Stories Bar */
+        .stories-bar { display: flex; padding: 12px 8px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
         .story-item { display: flex; flex-direction: column; align-items: center; min-width: 75px; cursor: pointer; }
         .story-ring { width: 66px; height: 66px; border-radius: 50%; background: var(--insta-gradient); padding: 2px; display: flex; justify-content: center; align-items: center; }
         .story-avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background-size: cover; background-position: center; }
         .story-name { font-size: 11px; margin-top: 4px; color: var(--text); }
 
-        /* Feed Post */
+        /* Story Viewer */
+        #story-viewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 2000; display: none; flex-direction: column;
+        }
+        .story-progress-container { position: absolute; top: 10px; left: 0; width: 100%; display: flex; gap: 5px; padding: 0 10px; }
+        .story-progress-bar { height: 2px; background: rgba(255,255,255,0.3); flex: 1; border-radius: 1px; overflow: hidden; }
+        .story-progress-fill { height: 100%; background: #fff; width: 0%; }
+        
+        .story-header { position: absolute; top: 25px; left: 15px; display: flex; align-items: center; gap: 10px; color: #fff; z-index: 10; width: calc(100% - 30px); }
+        .story-header-user { display: flex; align-items: center; gap: 8px; flex: 1; }
+        .story-header-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; border: 1px solid rgba(255,255,255,0.2); }
+        
+        .story-content { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        .story-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        /* Touch areas for next/prev */
+        .story-touch { position: absolute; top: 0; height: 100%; width: 50%; z-index: 5; }
+        .story-touch-left { left: 0; }
+        .story-touch-right { right: 0; }
+
+        .story-footer { padding: 20px; display: flex; align-items: center; gap: 15px; background: linear-gradient(transparent, rgba(0,0,0,0.5)); position: absolute; bottom: 0; width: 100%; }
+        .story-input { flex: 1; background: transparent; border: 1px solid rgba(255,255,255,0.5); border-radius: 25px; padding: 10px 20px; color: #fff; outline: none; }
+        .story-like-btn { font-size: 28px; color: #fff; cursor: pointer; transition: transform 0.1s; }
+        .story-like-btn.liked { color: var(--red); transform: scale(1.1); }
+
+        /* Feed */
         .post { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
         .post-header { display: flex; align-items: center; padding: 12px; gap: 10px; }
         .post-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; }
@@ -68,22 +92,10 @@
         .reel-video { width: 100%; height: 100%; object-fit: cover; }
         .reel-overlay { position: absolute; bottom: 20px; left: 15px; color: #fff; z-index: 5; }
 
-        /* Profile */
-        .profile-info { padding: 20px; display: flex; align-items: center; gap: 20px; }
-        .my-pic { width: 80px; height: 80px; border-radius: 50%; background-size: cover; border: 1px solid var(--border); cursor: pointer; }
-        .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
-        .grid-item { aspect-ratio: 1/1; background-size: cover; background-position: center; }
-
-        /* Upload Modal */
-        #upload-modal {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
-            display: none; align-items: center; justify-content: center; padding: 20px;
-        }
-        .modal-content { background: #fff; width: 100%; border-radius: 12px; padding: 20px; text-align: center; }
-
         /* Nav */
         nav { height: 50px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; background: #fff; }
         .nav-icon { font-size: 24px; cursor: pointer; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -108,20 +120,15 @@
                 <div class="stories-bar" id="stories-container"></div>
                 <div id="feed-container"></div>
             </section>
-
             <section id="sec-reels" class="section">
                 <div class="reels-container" id="reels-container"></div>
             </section>
-
             <section id="sec-profile" class="section">
-                <div class="profile-info">
-                    <div id="my-profile-pic" class="my-pic"></div>
-                    <div>
-                        <h3 id="display-username"></h3>
-                        <p style="color: var(--secondary-text);">Usuário VTGUIA</p>
-                    </div>
+                <div style="padding: 20px; display: flex; align-items: center; gap: 20px;">
+                    <div id="my-profile-pic" style="width: 80px; height: 80px; border-radius: 50%; background-size: cover; border: 1px solid var(--border);"></div>
+                    <h3 id="display-username"></h3>
                 </div>
-                <div class="profile-grid" id="my-grid"></div>
+                <div class="profile-grid" id="my-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;"></div>
             </section>
         </main>
 
@@ -131,12 +138,33 @@
             <div onclick="showSection('profile')" class="nav-icon">👤</div>
         </nav>
 
+        <!-- Story Viewer -->
+        <div id="story-viewer">
+            <div class="story-progress-container" id="story-progress-container"></div>
+            <div class="story-header">
+                <div class="story-header-user">
+                    <div class="story-header-avatar" id="story-header-avatar"></div>
+                    <strong id="story-header-name"></strong>
+                </div>
+                <span style="cursor: pointer; font-size: 24px;" onclick="closeStory()">✕</span>
+            </div>
+            <div class="story-content">
+                <div class="story-touch story-touch-left" onclick="prevStory()"></div>
+                <div class="story-touch story-touch-right" onclick="nextStory()"></div>
+                <img id="story-img" class="story-img" src="">
+            </div>
+            <div class="story-footer">
+                <input type="text" class="story-input" placeholder="Enviar mensagem...">
+                <span class="story-like-btn" id="story-like-icon" onclick="toggleStoryLike()">❤️</span>
+            </div>
+        </div>
+
         <!-- Upload Modal -->
-        <div id="upload-modal">
-            <div class="modal-content">
+        <div id="upload-modal" class="hidden" style="position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px;">
+            <div style="background: #fff; width: 100%; border-radius: 12px; padding: 20px;">
                 <h3>Novo Post</h3>
                 <input type="file" id="post-file" accept="image/*" style="margin: 20px 0;">
-                <textarea id="post-caption" class="auth-input" placeholder="Escreva uma legenda..."></textarea>
+                <textarea id="post-caption" class="auth-input" placeholder="Legenda..."></textarea>
                 <button onclick="publishPost()" class="auth-btn">Publicar</button>
                 <button onclick="closeUpload()" class="auth-btn" style="background: #eee; color: #333; margin-top: 10px;">Cancelar</button>
             </div>
@@ -146,33 +174,25 @@
     <script>
         let currentUser = { name: '', pic: '' };
         let myPosts = [];
+        let currentStoryIndex = 0;
+        let storyInterval;
+        let storyProgress = 0;
 
-        const data = {
-            stories: [
-                { name: 'AI_Influencer', img: 'https://images.unsplash.com/photo-1675426513824-7b7b9c7355ac?w=200', type: 'ai' },
-                { name: 'Cyber_Vibe', img: 'https://images.unsplash.com/photo-1614728263952-84ea206f99b6?w=200', type: 'ai' },
-                { name: 'Real_Travel', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', type: 'real' },
-                { name: 'Tech_Guy', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', type: 'real' }
-            ],
-            reels: [
-                { user: 'ai_art', video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-futuristic-city-4412-large.mp4' },
-                { user: 'nature_ai', video: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
-            ]
-        };
+        const storiesData = [
+            { name: 'IA_Artist', img: 'https://images.unsplash.com/photo-1675426513824-7b7b9c7355ac?w=400', liked: false },
+            { name: 'Cyber_Girl', img: 'https://images.unsplash.com/photo-1614728263952-84ea206f99b6?w=400', liked: false },
+            { name: 'Vitor_Design', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400', liked: false },
+            { name: 'Nature_IA', img: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400', liked: false }
+        ];
 
         function login() {
             const name = document.getElementById('username-input').value;
             const picInput = document.getElementById('profile-upload');
-            
             if (!name) return alert('Digite um nome!');
-            
             currentUser.name = name;
             if (picInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    currentUser.pic = e.target.result;
-                    startApp();
-                };
+                reader.onload = (e) => { currentUser.pic = e.target.result; startApp(); };
                 reader.readAsDataURL(picInput.files[0]);
             } else {
                 currentUser.pic = 'https://via.placeholder.com/150';
@@ -184,7 +204,7 @@
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('display-username').innerText = currentUser.name;
             document.getElementById('my-profile-pic').style.backgroundImage = `url(${currentUser.pic})`;
-            renderStories();
+            renderStoriesBar();
             renderReels();
         }
 
@@ -193,39 +213,102 @@
             document.getElementById('sec-' + id).classList.add('active');
         }
 
-        function renderStories() {
+        function renderStoriesBar() {
             const container = document.getElementById('stories-container');
             container.innerHTML = `<div class="story-item"><div class="story-ring" style="background:#eee"><div class="story-avatar" style="background-image:url(${currentUser.pic})"></div></div><span class="story-name">Seu story</span></div>`;
-            data.stories.forEach(s => {
-                container.innerHTML += `<div class="story-item"><div class="story-ring"><div class="story-avatar" style="background-image:url(${s.img})"></div></div><span class="story-name">${s.name}</span></div>`;
+            storiesData.forEach((s, index) => {
+                container.innerHTML += `<div class="story-item" onclick="openStory(${index})"><div class="story-ring"><div class="story-avatar" style="background-image:url(${s.img})"></div></div><span class="story-name">${s.name}</span></div>`;
             });
+        }
+
+        function openStory(index) {
+            currentStoryIndex = index;
+            document.getElementById('story-viewer').style.display = 'flex';
+            renderStoryProgressBars();
+            loadStory(index);
+        }
+
+        function renderStoryProgressBars() {
+            const container = document.getElementById('story-progress-container');
+            container.innerHTML = '';
+            storiesData.forEach((_, i) => {
+                const bar = document.createElement('div');
+                bar.className = 'story-progress-bar';
+                bar.innerHTML = `<div class="story-progress-fill" id="fill-${i}" style="width: ${i < currentStoryIndex ? '100%' : '0%'}"></div>`;
+                container.appendChild(bar);
+            });
+        }
+
+        function loadStory(index) {
+            clearInterval(storyInterval);
+            const story = storiesData[index];
+            document.getElementById('story-header-avatar').style.backgroundImage = `url(${story.img})`;
+            document.getElementById('story-header-name').innerText = story.name;
+            document.getElementById('story-img').src = story.img;
+            document.getElementById('story-like-icon').className = story.liked ? 'story-like-btn liked' : 'story-like-btn';
+            
+            storyProgress = 0;
+            const fill = document.getElementById(`fill-${index}`);
+            storyInterval = setInterval(() => {
+                storyProgress += 1;
+                fill.style.width = storyProgress + '%';
+                if (storyProgress >= 100) {
+                    nextStory();
+                }
+            }, 30); // 3 seconds total
+        }
+
+        function nextStory() {
+            if (currentStoryIndex < storiesData.length - 1) {
+                currentStoryIndex++;
+                renderStoryProgressBars();
+                loadStory(currentStoryIndex);
+            } else {
+                closeStory();
+            }
+        }
+
+        function prevStory() {
+            if (currentStoryIndex > 0) {
+                currentStoryIndex--;
+                renderStoryProgressBars();
+                loadStory(currentStoryIndex);
+            } else {
+                loadStory(0);
+            }
+        }
+
+        function toggleStoryLike() {
+            const story = storiesData[currentStoryIndex];
+            story.liked = !story.liked;
+            document.getElementById('story-like-icon').className = story.liked ? 'story-like-btn liked' : 'story-like-btn';
+        }
+
+        function closeStory() {
+            document.getElementById('story-viewer').style.display = 'none';
+            clearInterval(storyInterval);
         }
 
         function renderReels() {
             const container = document.getElementById('reels-container');
-            data.reels.forEach(r => {
-                container.innerHTML += `
-                    <div class="reel-item">
-                        <video class="reel-video" src="${r.video}" loop muted autoplay></video>
-                        <div class="reel-overlay"><strong>@${r.user}</strong><p>Gerado por IA ✨</p></div>
-                    </div>
-                `;
+            const reels = [
+                { user: 'ai_future', video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-futuristic-city-4412-large.mp4' },
+                { user: 'cyber_nature', video: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
+            ];
+            reels.forEach(r => {
+                container.innerHTML += `<div class="reel-item"><video class="reel-video" src="${r.video}" loop muted autoplay></video><div class="reel-overlay"><strong>@${r.user}</strong><p>Gerado por IA ✨</p></div></div>`;
             });
         }
 
         function openUpload() { document.getElementById('upload-modal').style.display = 'flex'; }
         function closeUpload() { document.getElementById('upload-modal').style.display = 'none'; }
-
         function publishPost() {
             const fileInput = document.getElementById('post-file');
             const caption = document.getElementById('post-caption').value;
-            
-            if (!fileInput.files[0]) return alert('Escolha uma foto!');
-
+            if (!fileInput.files[0]) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const newPost = { img: e.target.result, caption: caption };
-                myPosts.unshift(newPost);
+                myPosts.unshift({ img: e.target.result, caption });
                 renderFeed();
                 renderProfileGrid();
                 closeUpload();
@@ -237,23 +320,14 @@
             const container = document.getElementById('feed-container');
             container.innerHTML = '';
             myPosts.forEach(p => {
-                container.innerHTML += `
-                    <div class="post">
-                        <div class="post-header"><div class="post-avatar" style="background-image:url(${currentUser.pic})"></div><strong>${currentUser.name}</strong></div>
-                        <img src="${p.img}" class="post-img">
-                        <div class="post-actions">❤️ 💬 ✈️</div>
-                        <div style="padding:0 12px 12px"><strong>${currentUser.name}</strong> ${p.caption}</div>
-                    </div>
-                `;
+                container.innerHTML += `<div class="post"><div class="post-header"><div class="post-avatar" style="background-image:url(${currentUser.pic})"></div><strong>${currentUser.name}</strong></div><img src="${p.img}" class="post-img"><div class="post-actions">❤️ 💬 ✈️</div><div style="padding:0 12px 12px"><strong>${currentUser.name}</strong> ${p.caption}</div></div>`;
             });
         }
 
         function renderProfileGrid() {
             const container = document.getElementById('my-grid');
             container.innerHTML = '';
-            myPosts.forEach(p => {
-                container.innerHTML += `<div class="grid-item" style="background-image:url(${p.img})"></div>`;
-            });
+            myPosts.forEach(p => { container.innerHTML += `<div style="aspect-ratio:1/1; background-image:url(${p.img}); background-size:cover; background-position:center;"></div>`; });
         }
     </script>
 </body>
