@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VTGUIA</title>
+    <title>VTGUIA - Social AI</title>
     <style>
         :root {
             --bg: #ffffff;
@@ -25,87 +25,85 @@
             border-left: 1px solid var(--border); border-right: 1px solid var(--border);
         }
 
+        /* Auth Screen */
+        #auth-screen {
+            position: absolute; inset: 0; background: #fff; z-index: 5000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;
+        }
+        .auth-input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); border-radius: 5px; background: #fafafa; }
+        .auth-btn { width: 100%; padding: 12px; background: var(--blue); color: #fff; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* Header */
         header {
             height: 60px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 16px; background: #fff; z-index: 100;
         }
         .logo { font-size: 24px; font-weight: bold; font-family: 'Arial Black', sans-serif; letter-spacing: -1px; }
-        .header-icons { display: flex; gap: 20px; font-size: 22px; cursor: pointer; }
 
-        main { flex: 1; overflow-y: auto; scrollbar-width: none; }
+        /* Main Content */
+        main { flex: 1; overflow-y: auto; scrollbar-width: none; position: relative; }
         main::-webkit-scrollbar { display: none; }
 
-        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section { display: none; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Stories Bar */
-        .stories-bar { display: flex; padding: 12px 8px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-        .stories-bar::-webkit-scrollbar { display: none; }
+        /* Stories */
+        .stories-bar { display: flex; padding: 12px 8px; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--border); }
         .story-item { display: flex; flex-direction: column; align-items: center; min-width: 75px; cursor: pointer; }
-        .story-ring { 
-            width: 66px; height: 66px; border-radius: 50%; 
-            background: var(--insta-gradient); padding: 2px; 
-            display: flex; justify-content: center; align-items: center;
-        }
+        .story-ring { width: 66px; height: 66px; border-radius: 50%; background: var(--insta-gradient); padding: 2px; display: flex; justify-content: center; align-items: center; }
         .story-avatar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid #fff; background-size: cover; background-position: center; }
-        .story-name { font-size: 11px; margin-top: 4px; color: var(--text); text-align: center; }
+        .story-name { font-size: 11px; margin-top: 4px; color: var(--text); }
 
-        /* Story Viewer */
-        #story-viewer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 2000; display: none; flex-direction: column;
-        }
-        .story-header { position: absolute; top: 15px; left: 15px; display: flex; align-items: center; gap: 10px; color: #fff; z-index: 10; }
-        .story-progress { position: absolute; top: 5px; width: 96%; left: 2%; height: 2px; background: rgba(255,255,255,0.3); }
-        .story-progress-fill { height: 100%; background: #fff; width: 0%; transition: width linear; }
-        .story-content { flex: 1; display: flex; align-items: center; justify-content: center; }
-        .story-content img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .story-footer { padding: 20px; display: flex; align-items: center; gap: 15px; }
-        .story-input { flex: 1; background: transparent; border: 1px solid #fff; border-radius: 20px; padding: 8px 15px; color: #fff; outline: none; }
-        .story-like-btn { font-size: 24px; color: #fff; cursor: pointer; transition: transform 0.2s; }
-        .story-like-btn.liked { color: var(--red); transform: scale(1.2); }
-
-        /* Post */
+        /* Feed Post */
         .post { border-bottom: 1px solid var(--border); margin-bottom: 10px; }
-        .post-header { display: flex; align-items: center; justify-content: space-between; padding: 12px; }
-        .post-user { display: flex; align-items: center; gap: 10px; }
+        .post-header { display: flex; align-items: center; padding: 12px; gap: 10px; }
         .post-avatar { width: 32px; height: 32px; border-radius: 50%; background-size: cover; }
-        .post-username { font-size: 14px; font-weight: 600; }
-        .post-img-container { width: 100%; aspect-ratio: 1/1; background: #efefef; overflow: hidden; position: relative; }
-        .post-img { width: 100%; height: 100%; object-fit: cover; }
-        .post-actions { display: flex; padding: 12px; gap: 16px; font-size: 24px; }
-        .post-action-icon { cursor: pointer; transition: transform 0.1s; }
-        .post-action-icon:active { transform: scale(1.2); }
-        .liked { color: var(--red); }
-        .post-likes { padding: 0 12px; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-        .post-caption { padding: 0 12px 12px; font-size: 14px; line-height: 1.4; }
+        .post-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .post-actions { padding: 12px; display: flex; gap: 16px; font-size: 24px; }
 
         /* Reels */
         .reels-container { height: 100%; background: #000; overflow-y: scroll; snap-type: y mandatory; }
         .reel-item { height: 100%; width: 100%; snap-align: start; position: relative; }
-        .reel-video-sim { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 100px; }
-        .reel-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: #fff; }
-        .reel-actions-side { position: absolute; right: 10px; bottom: 100px; display: flex; flex-direction: column; gap: 20px; color: #fff; align-items: center; }
+        .reel-video { width: 100%; height: 100%; object-fit: cover; }
+        .reel-overlay { position: absolute; bottom: 20px; left: 15px; color: #fff; z-index: 5; }
 
-        /* Bottom Nav */
-        nav { height: 50px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; background: #fff; z-index: 100; }
+        /* Profile */
+        .profile-info { padding: 20px; display: flex; align-items: center; gap: 20px; }
+        .my-pic { width: 80px; height: 80px; border-radius: 50%; background-size: cover; border: 1px solid var(--border); cursor: pointer; }
+        .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+        .grid-item { aspect-ratio: 1/1; background-size: cover; background-position: center; }
+
+        /* Upload Modal */
+        #upload-modal {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content { background: #fff; width: 100%; border-radius: 12px; padding: 20px; text-align: center; }
+
+        /* Nav */
+        nav { height: 50px; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; background: #fff; }
         .nav-icon { font-size: 24px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <header id="app-header">
+        <!-- Auth -->
+        <div id="auth-screen">
+            <h1 style="margin-bottom: 30px; font-family: 'Arial Black';">VTGUIA</h1>
+            <input type="text" id="username-input" class="auth-input" placeholder="Nome de usuário">
+            <input type="file" id="profile-upload" class="hidden" accept="image/*">
+            <button onclick="document.getElementById('profile-upload').click()" class="auth-btn" style="background: #eee; color: #333; margin-bottom: 10px;">Escolher Foto de Perfil</button>
+            <button onclick="login()" class="auth-btn">Entrar</button>
+        </div>
+
+        <header>
             <div class="logo">VTGUIA</div>
-            <div class="header-icons">
-                <span onclick="alert('Notificações em breve!')">❤️</span>
-                <span onclick="showSection('chat')">📩</span>
-            </div>
+            <div style="font-size: 24px; cursor: pointer;" onclick="openUpload()">➕</div>
         </header>
 
-        <main id="main-content">
+        <main>
             <section id="sec-home" class="section active">
                 <div class="stories-bar" id="stories-container"></div>
                 <div id="feed-container"></div>
@@ -115,61 +113,79 @@
                 <div class="reels-container" id="reels-container"></div>
             </section>
 
-            <section id="sec-chat" class="section">
-                <div style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 20px;">
-                    <span onclick="showSection('home')" style="cursor:pointer; font-size: 20px;">⬅️</span>
-                    <h2 style="font-size: 18px;">Mensagens</h2>
-                </div>
-                <div id="chat-list" style="padding: 10px;"></div>
-            </section>
-
             <section id="sec-profile" class="section">
-                <!-- Profile content same as before -->
-                <div style="padding: 20px; text-align: center;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background: #eee; margin: 0 auto 10px; background-image: url('https://images.unsplash.com/photo-153571501da13a22ce55605e1a455d04?w=200'); background-size: cover;"></div>
-                    <h3>Vitor Gabriel</h3>
-                    <p>VTGUIA Creator</p>
+                <div class="profile-info">
+                    <div id="my-profile-pic" class="my-pic"></div>
+                    <div>
+                        <h3 id="display-username"></h3>
+                        <p style="color: var(--secondary-text);">Usuário VTGUIA</p>
+                    </div>
                 </div>
+                <div class="profile-grid" id="my-grid"></div>
             </section>
         </main>
 
         <nav>
-            <div class="nav-icon" onclick="showSection('home')">🏠</div>
-            <div class="nav-icon" onclick="showSection('reels')">🎞️</div>
-            <div class="nav-icon" onclick="showSection('profile')">👤</div>
+            <div onclick="showSection('home')" class="nav-icon">🏠</div>
+            <div onclick="showSection('reels')" class="nav-icon">🎞️</div>
+            <div onclick="showSection('profile')" class="nav-icon">👤</div>
         </nav>
-    </div>
 
-    <!-- Story Viewer Modal -->
-    <div id="story-viewer">
-        <div class="story-progress"><div class="story-progress-fill" id="story-fill"></div></div>
-        <div class="story-header">
-            <div id="story-user-img" style="width:32px; height:32px; border-radius:50%; background-size:cover;"></div>
-            <strong id="story-user-name"></strong>
-            <span style="margin-left: auto; cursor: pointer; font-size: 20px;" onclick="closeStory()">✕</span>
-        </div>
-        <div class="story-content">
-            <img id="story-img" src="">
-        </div>
-        <div class="story-footer">
-            <input type="text" class="story-input" placeholder="Enviar mensagem...">
-            <span class="story-like-btn" id="story-like-icon" onclick="toggleStoryLike()">❤️</span>
+        <!-- Upload Modal -->
+        <div id="upload-modal">
+            <div class="modal-content">
+                <h3>Novo Post</h3>
+                <input type="file" id="post-file" accept="image/*" style="margin: 20px 0;">
+                <textarea id="post-caption" class="auth-input" placeholder="Escreva uma legenda..."></textarea>
+                <button onclick="publishPost()" class="auth-btn">Publicar</button>
+                <button onclick="closeUpload()" class="auth-btn" style="background: #eee; color: #333; margin-top: 10px;">Cancelar</button>
+            </div>
         </div>
     </div>
 
     <script>
+        let currentUser = { name: '', pic: '' };
+        let myPosts = [];
+
         const data = {
-            users: [
-                { id: 1, name: 'ana_clara', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', post: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600', caption: 'Paraíso! 🌴', likes: 123, liked: false, storyLiked: false },
-                { id: 2, name: 'marcos_dev', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', post: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', caption: 'Foco no código. 💻', likes: 85, liked: false, storyLiked: false }
+            stories: [
+                { name: 'AI_Influencer', img: 'https://images.unsplash.com/photo-1675426513824-7b7b9c7355ac?w=200', type: 'ai' },
+                { name: 'Cyber_Vibe', img: 'https://images.unsplash.com/photo-1614728263952-84ea206f99b6?w=200', type: 'ai' },
+                { name: 'Real_Travel', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200', type: 'real' },
+                { name: 'Tech_Guy', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200', type: 'real' }
+            ],
+            reels: [
+                { user: 'ai_art', video: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-futuristic-city-4412-large.mp4' },
+                { user: 'nature_ai', video: 'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4' }
             ]
         };
 
-        let currentStoryUser = null;
+        function login() {
+            const name = document.getElementById('username-input').value;
+            const picInput = document.getElementById('profile-upload');
+            
+            if (!name) return alert('Digite um nome!');
+            
+            currentUser.name = name;
+            if (picInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentUser.pic = e.target.result;
+                    startApp();
+                };
+                reader.readAsDataURL(picInput.files[0]);
+            } else {
+                currentUser.pic = 'https://via.placeholder.com/150';
+                startApp();
+            }
+        }
 
-        function init() {
+        function startApp() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('display-username').innerText = currentUser.name;
+            document.getElementById('my-profile-pic').style.backgroundImage = `url(${currentUser.pic})`;
             renderStories();
-            renderFeed();
+            renderReels();
         }
 
         function showSection(id) {
@@ -179,87 +195,66 @@
 
         function renderStories() {
             const container = document.getElementById('stories-container');
-            container.innerHTML = '';
-            data.users.forEach(u => {
-                const div = document.createElement('div');
-                div.className = 'story-item';
-                div.onclick = () => openStory(u);
-                div.innerHTML = `
-                    <div class="story-ring"><div class="story-avatar" style="background-image: url('${u.img}')"></div></div>
-                    <span class="story-name">${u.name}</span>
-                `;
-                container.appendChild(div);
+            container.innerHTML = `<div class="story-item"><div class="story-ring" style="background:#eee"><div class="story-avatar" style="background-image:url(${currentUser.pic})"></div></div><span class="story-name">Seu story</span></div>`;
+            data.stories.forEach(s => {
+                container.innerHTML += `<div class="story-item"><div class="story-ring"><div class="story-avatar" style="background-image:url(${s.img})"></div></div><span class="story-name">${s.name}</span></div>`;
             });
         }
 
-        function openStory(user) {
-            currentStoryUser = user;
-            const viewer = document.getElementById('story-viewer');
-            const fill = document.getElementById('story-fill');
-            const likeIcon = document.getElementById('story-like-icon');
-            
-            document.getElementById('story-user-img').style.backgroundImage = `url(${user.img})`;
-            document.getElementById('story-user-name').innerText = user.name;
-            document.getElementById('story-img').src = user.post;
-            
-            likeIcon.className = user.storyLiked ? 'story-like-btn liked' : 'story-like-btn';
-            
-            viewer.style.display = 'flex';
-            fill.style.width = '0%';
-            setTimeout(() => { fill.style.transition = 'width 3s linear'; fill.style.width = '100%'; }, 50);
-            
-            window.storyTimeout = setTimeout(closeStory, 3050);
+        function renderReels() {
+            const container = document.getElementById('reels-container');
+            data.reels.forEach(r => {
+                container.innerHTML += `
+                    <div class="reel-item">
+                        <video class="reel-video" src="${r.video}" loop muted autoplay></video>
+                        <div class="reel-overlay"><strong>@${r.user}</strong><p>Gerado por IA ✨</p></div>
+                    </div>
+                `;
+            });
         }
 
-        function closeStory() {
-            document.getElementById('story-viewer').style.display = 'none';
-            document.getElementById('story-fill').style.transition = 'none';
-            clearTimeout(window.storyTimeout);
-        }
+        function openUpload() { document.getElementById('upload-modal').style.display = 'flex'; }
+        function closeUpload() { document.getElementById('upload-modal').style.display = 'none'; }
 
-        function toggleStoryLike() {
-            currentStoryUser.storyLiked = !currentStoryUser.storyLiked;
-            const likeIcon = document.getElementById('story-like-icon');
-            likeIcon.className = currentStoryUser.storyLiked ? 'story-like-btn liked' : 'story-like-btn';
+        function publishPost() {
+            const fileInput = document.getElementById('post-file');
+            const caption = document.getElementById('post-caption').value;
+            
+            if (!fileInput.files[0]) return alert('Escolha uma foto!');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const newPost = { img: e.target.result, caption: caption };
+                myPosts.unshift(newPost);
+                renderFeed();
+                renderProfileGrid();
+                closeUpload();
+            };
+            reader.readAsDataURL(fileInput.files[0]);
         }
 
         function renderFeed() {
             const container = document.getElementById('feed-container');
             container.innerHTML = '';
-            data.users.forEach(u => {
-                const postDiv = document.createElement('div');
-                postDiv.className = 'post';
-                postDiv.innerHTML = `
-                    <div class="post-header">
-                        <div class="post-user">
-                            <div class="post-avatar" style="background-image: url('${u.img}')"></div>
-                            <span class="post-username">${u.name}</span>
-                        </div>
-                        <span>•••</span>
+            myPosts.forEach(p => {
+                container.innerHTML += `
+                    <div class="post">
+                        <div class="post-header"><div class="post-avatar" style="background-image:url(${currentUser.pic})"></div><strong>${currentUser.name}</strong></div>
+                        <img src="${p.img}" class="post-img">
+                        <div class="post-actions">❤️ 💬 ✈️</div>
+                        <div style="padding:0 12px 12px"><strong>${currentUser.name}</strong> ${p.caption}</div>
                     </div>
-                    <div class="post-img-container" ondblclick="likePost(${u.id})">
-                        <img src="${u.post}" class="post-img">
-                    </div>
-                    <div class="post-actions">
-                        <span class="post-action-icon ${u.liked ? 'liked' : ''}" onclick="likePost(${u.id})">${u.liked ? '❤️' : '🤍'}</span>
-                        <span class="post-action-icon">💬</span>
-                        <span class="post-action-icon">✈️</span>
-                    </div>
-                    <div class="post-likes" id="likes-${u.id}">${u.likes} curtidas</div>
-                    <div class="post-caption"><strong>${u.name}</strong> ${u.caption}</div>
                 `;
-                container.appendChild(postDiv);
             });
         }
 
-        function likePost(id) {
-            const user = data.users.find(u => u.id === id);
-            user.liked = !user.liked;
-            user.likes += user.liked ? 1 : -1;
-            renderFeed();
+        function renderProfileGrid() {
+            const container = document.getElementById('my-grid');
+            container.innerHTML = '';
+            myPosts.forEach(p => {
+                container.innerHTML += `<div class="grid-item" style="background-image:url(${p.img})"></div>`;
+            });
         }
-
-        window.onload = init;
     </script>
 </body>
 </html>
