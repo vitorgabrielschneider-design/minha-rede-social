@@ -3,364 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram Clone</title>
+    <title>WhatsApp Clone</title>
     <style>
         :root {
-            --bg: #fafafa;
-            --white: #ffffff;
-            --text: #262626;
-            --border: #dbdbdb;
-            --blue: #0095f6;
-            --gray: #8e8e8e;
-            --heart: #ed4956;
+            --header-bg: #075e54;
+            --header-text: #ffffff;
+            --chat-bg: #e5ddd5;
+            --sent-bubble: #dcf8c6;
+            --received-bubble: #ffffff;
+            --text-main: #000000;
+            --text-gray: #757575;
+            --bg-body: #f0f2f5;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        body { background-color: var(--bg-body); height: 100vh; display: flex; justify-content: center; overflow: hidden; }
 
-        /* Navbar */
-        nav.top-nav {
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border);
+        /* Container Principal (Layout de Desktop para simular Web) */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 95vh;
+            margin-top: 2.5vh;
+            background: #fff;
+            display: flex;
+            box-shadow: 0 1px 1px 0 rgba(0,0,0,.06), 0 2px 5px 0 rgba(0,0,0,.2);
+        }
+
+        /* Barra Lateral (Lista de Conversas) */
+        .sidebar {
+            width: 30%;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .sidebar-header {
             height: 60px;
+            background: #ededed;
             display: flex;
-            justify-content: center;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-content {
-            width: 100%;
-            max-width: 975px;
-            display: flex;
+            padding: 0 15px;
             justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
         }
 
-        .logo { font-size: 24px; font-weight: bold; font-style: italic; cursor: pointer; }
+        .user-avatar-sim { width: 40px; height: 40px; background: #ccc; border-radius: 50%; }
 
-        .nav-icons { display: flex; gap: 22px; font-size: 22px; cursor: pointer; }
-
-        /* Main Content */
-        main {
+        .search-bar { padding: 10px; background: #f6f6f6; }
+        .search-bar input {
             width: 100%;
-            max-width: 600px;
-            margin: 30px auto;
-            flex: 1;
-            padding-bottom: 70px;
-        }
-
-        /* Feed Section */
-        .post {
-            background-color: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 3px;
-            margin-bottom: 24px;
-        }
-
-        .post-header {
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            font-weight: 600;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            outline: none;
             font-size: 14px;
         }
 
-        /* Sem foto de perfil, apenas o nome */
-        .post-user-info { display: flex; align-items: center; }
-
-        .post-image {
-            width: 100%;
-            aspect-ratio: 1/1;
-            background-color: #efefef;
+        .chat-list { flex: 1; overflow-y: auto; }
+        .chat-item {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f2f2f2;
+            transition: background 0.3s;
         }
+        .chat-item:hover { background: #f5f5f5; }
+        .chat-item.active { background: #ebebeb; }
 
-        .post-actions {
-            padding: 12px 16px;
+        .chat-info { flex: 1; margin-left: 15px; }
+        .chat-info-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .chat-name { font-weight: 600; font-size: 16px; }
+        .chat-time { font-size: 12px; color: var(--text-gray); }
+        .chat-last-msg { font-size: 14px; color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Área de Chat */
+        .chat-area {
+            width: 70%;
             display: flex;
-            gap: 16px;
-            font-size: 24px;
-        }
-
-        .action-btn { cursor: pointer; transition: transform 0.1s; }
-        .action-btn:active { transform: scale(1.2); }
-        .liked { color: var(--heart); }
-
-        .post-details { padding: 0 16px 16px; font-size: 14px; }
-        .likes-count { font-weight: 600; margin-bottom: 8px; display: block; }
-        .caption { line-height: 1.4; }
-        .caption strong { margin-right: 5px; }
-
-        /* Reels Section */
-        .reels-container {
-            display: none;
-            background: #000;
-            height: calc(100vh - 60px);
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            scrollbar-width: none;
-        }
-        .reels-container::-webkit-scrollbar { display: none; }
-        .reel-card {
-            height: 100%;
-            width: 100%;
-            scroll-snap-align: start;
+            flex-direction: column;
+            background: var(--chat-bg);
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .reel-video-sim { width: 100%; height: 100%; object-fit: cover; }
-        .reel-overlay {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: #fff;
-            z-index: 10;
         }
 
-        /* Chat Section */
-        .chat-container {
-            display: none;
-            background: var(--white);
-            border: 1px solid var(--border);
-            height: 500px;
-            border-radius: 4px;
-        }
         .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            text-align: center;
-            font-weight: 600;
+            height: 60px;
+            background: #ededed;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-left: 1px solid #ddd;
         }
-        .chat-messages {
-            height: 380px;
-            padding: 20px;
+
+        .messages-container {
+            flex: 1;
+            padding: 20px 50px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
         }
-        .bubble {
+
+        .message {
+            max-width: 60%;
             padding: 8px 12px;
-            border-radius: 20px;
-            max-width: 70%;
+            border-radius: 8px;
             font-size: 14px;
+            position: relative;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
         }
-        .bubble.sent { background: var(--blue); color: #fff; align-self: flex-end; }
-        .bubble.received { background: #efefef; align-self: flex-start; }
+        .message.sent { background: var(--sent-bubble); align-self: flex-end; }
+        .message.received { background: var(--received-bubble); align-self: flex-start; }
 
-        .chat-input-area {
-            padding: 10px 20px;
-            border-top: 1px solid var(--border);
+        .message-time {
+            font-size: 10px;
+            color: var(--text-gray);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* Input de Mensagem */
+        .input-area {
+            height: 62px;
+            background: #f0f0f0;
             display: flex;
-            gap: 10px;
-        }
-        .chat-input-area input {
-            flex: 1;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 15px;
-            outline: none;
-        }
-
-        /* Profile Section */
-        .profile-container {
-            display: none;
-            padding: 20px;
-            text-align: center;
-        }
-        .profile-name-big { font-size: 28px; font-weight: 300; margin-bottom: 20px; }
-        .edit-profile-btn {
-            background: none;
-            border: 1px solid var(--border);
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Bottom Nav (Mobile style) */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 50px;
-            background: var(--white);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
             align-items: center;
-            font-size: 24px;
-            z-index: 1000;
+            padding: 0 15px;
+            gap: 15px;
         }
 
-        .hidden { display: none !important; }
-        .active-tab { color: var(--blue); }
+        .input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            outline: none;
+            font-size: 15px;
+        }
+
+        .send-btn { cursor: pointer; font-size: 24px; color: #51585c; }
+
+        /* Responsividade para Mobile */
+        @media (max-width: 768px) {
+            .app-container { height: 100vh; margin-top: 0; }
+            .sidebar { width: 100%; }
+            .chat-area { display: none; width: 100%; position: absolute; top: 0; left: 0; height: 100%; z-index: 10; }
+            .chat-area.active { display: flex; }
+        }
     </style>
 </head>
 <body>
 
-    <nav class="top-nav">
-        <div class="nav-content">
-            <div class="logo" onclick="showTab('feed')">Instagram</div>
-            <div class="nav-icons">
-                <span onclick="showTab('chat')">📩</span>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar-sim"></div>
+                <div style="font-size: 20px; color: #51585c;">💬 ⋮</div>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Pesquisar ou começar uma nova conversa">
+            </div>
+            <div class="chat-list" id="chat-list">
+                <!-- Conversas simuladas -->
+                <div class="chat-item active" onclick="openChat('Mãe', 'received')">
+                    <div class="user-avatar-sim"></div>
+                    <div class="chat-info">
+                        <div class="chat-info-top"><span class="chat-name">Mãe</span><span class="chat-time">10:45</span></div>
+                        <p class="chat-last-msg">Já chegou em casa?</p>
+                    </div>
+                </div>
+                <div class="chat-item" onclick="openChat('Grupo da Firma', 'received')">
+                    <div class="user-avatar-sim"></div>
+                    <div class="chat-info">
+                        <div class="chat-info-top"><span class="chat-name">Grupo da Firma</span><span class="chat-time">09:30</span></div>
+                        <p class="chat-last-msg">Reunião às 14h, pessoal!</p>
+                    </div>
+                </div>
+                <div class="chat-item" onclick="openChat('Vitor Gabriel', 'sent')">
+                    <div class="user-avatar-sim"></div>
+                    <div class="chat-info">
+                        <div class="chat-info-top"><span class="chat-name">Vitor Gabriel</span><span class="chat-time">Ontem</span></div>
+                        <p class="chat-last-msg">O projeto está pronto!</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
 
-    <main id="main-content">
-        <!-- TAB: FEED -->
-        <section id="tab-feed">
-            <div id="feed-list"></div>
-        </section>
+        <!-- Chat Area -->
+        <div class="chat-area" id="chat-area">
+            <div class="chat-header">
+                <div id="mobile-back" style="display: none; cursor: pointer; margin-right: 15px;" onclick="closeChat()">⬅</div>
+                <div class="user-avatar-sim" style="width: 35px; height: 35px;"></div>
+                <div style="margin-left: 15px;">
+                    <strong id="current-chat-name">Mãe</strong>
+                    <p style="font-size: 12px; color: var(--text-gray);">visto por último hoje às 10:45</p>
+                </div>
+            </div>
 
-        <!-- TAB: REELS -->
-        <section id="tab-reels" class="reels-container">
-            <div class="reel-card" style="background: #1a1a1a;">
-                <div style="font-size: 100px;">🎞️</div>
-                <div class="reel-overlay"><strong>@vitor_gabriel</strong><p>Explorando o novo Reels! 🔥</p></div>
+            <div class="messages-container" id="messages-list">
+                <!-- Mensagens iniciais -->
+                <div class="message received">Oi, filho! Já chegou em casa?<div class="message-time">10:45</div></div>
+                <div class="message sent">Oi mãe! Tô chegando agora.<div class="message-time">10:46</div></div>
             </div>
-            <div class="reel-card" style="background: #2c3e50;">
-                <div style="font-size: 100px;">✨</div>
-                <div class="reel-overlay"><strong>@vitor_gabriel</strong><p>Codando com estilo. 💻</p></div>
-            </div>
-        </section>
 
-        <!-- TAB: CHAT -->
-        <section id="tab-chat" class="chat-container">
-            <div class="chat-header">Direct</div>
-            <div class="chat-messages" id="chat-msgs">
-                <div class="bubble received">Olá! Tudo bem?</div>
+            <div class="input-area">
+                <span style="font-size: 24px; cursor: pointer;">😊</span>
+                <span style="font-size: 24px; cursor: pointer;">📎</span>
+                <input type="text" id="msg-input" placeholder="Digite uma mensagem" onkeypress="handleKey(event)">
+                <span class="send-btn" onclick="sendMsg()">➤</span>
             </div>
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" placeholder="Escreva uma mensagem...">
-                <button onclick="sendMsg()" style="border:none; background:none; color:var(--blue); font-weight:600; cursor:pointer;">Enviar</button>
-            </div>
-        </section>
-
-        <!-- TAB: PROFILE -->
-        <section id="tab-profile" class="profile-container">
-            <div class="profile-name-big" id="display-name">vitor_gabriel</div>
-            <div style="margin-bottom: 30px;">
-                <button class="edit-profile-btn" onclick="editProfile()">Editar Perfil</button>
-            </div>
-            <div id="edit-area" class="hidden">
-                <input type="text" id="new-name" placeholder="Novo nome de usuário" style="padding: 8px; border: 1px solid var(--border); border-radius: 4px; margin-bottom: 10px;"><br>
-                <button onclick="saveName()" style="background: var(--blue); color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer;">Salvar</button>
-            </div>
-        </section>
-    </main>
-
-    <nav class="bottom-nav">
-        <span onclick="showTab('feed')">🏠</span>
-        <span onclick="showTab('reels')">🎞️</span>
-        <span onclick="showTab('profile')">👤</span>
-    </nav>
+        </div>
+    </div>
 
     <script>
-        const posts = [
-            { user: 'ana_clara', emoji: '🌟', caption: 'Que dia maravilhoso! ✨', likes: 120 },
-            { user: 'joao_dev', emoji: '💻', caption: 'Novo projeto saindo do forno. 🚀', likes: 85 }
-        ];
+        const chatArea = document.getElementById('chat-area');
+        const messagesList = document.getElementById('messages-list');
+        const msgInput = document.getElementById('msg-input');
+        const chatName = document.getElementById('current-chat-name');
 
-        function initFeed() {
-            const list = document.getElementById('feed-list');
-            list.innerHTML = '';
-            posts.forEach((p, i) => {
-                const div = document.createElement('div');
-                div.className = 'post';
-                div.innerHTML = `
-                    <div class="post-header">
-                        <div class="post-user-info">
-                            <span>${p.user}</span>
-                        </div>
-                    </div>
-                    <div class="post-image">${p.emoji}</div>
-                    <div class="post-actions">
-                        <span class="action-btn" onclick="toggleLike(this)">🤍</span>
-                        <span class="action-btn">💬</span>
-                        <span class="action-btn">✈️</span>
-                    </div>
-                    <div class="post-details">
-                        <span class="likes-count">${p.likes} curtidas</span>
-                        <div class="caption"><strong>${p.user}</strong> ${p.caption}</div>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function showTab(tab) {
-            const sections = ['feed', 'reels', 'chat', 'profile'];
-            sections.forEach(s => {
-                const el = document.getElementById('tab-' + s);
-                if (el) el.style.display = 'none';
-            });
-
-            const activeEl = document.getElementById('tab-' + tab);
-            if (activeEl) {
-                if (tab === 'reels') activeEl.style.display = 'block';
-                else if (tab === 'chat') activeEl.style.display = 'block';
-                else activeEl.style.display = 'block';
-            }
-
-            // Estilo da Navbar Superior
-            const nav = document.querySelector('.top-nav');
-            if (tab === 'reels') {
-                nav.style.background = '#000';
-                nav.style.color = '#fff';
-                nav.style.borderBottom = 'none';
+        function openChat(name, type) {
+            chatName.innerText = name;
+            messagesList.innerHTML = ''; // Limpa mensagens anteriores
+            
+            // Simula mensagens baseadas no contato
+            if (name === 'Mãe') {
+                addMessage('Oi, filho! Já chegou em casa?', 'received');
+                addMessage('Oi mãe! Tô chegando agora.', 'sent');
+            } else if (name === 'Grupo da Firma') {
+                addMessage('Reunião às 14h, pessoal!', 'received');
             } else {
-                nav.style.background = '#fff';
-                nav.style.color = '#000';
-                nav.style.borderBottom = '1px solid var(--border)';
+                addMessage('O projeto está pronto!', 'sent');
+            }
+
+            // Ativa no mobile
+            if (window.innerWidth <= 768) {
+                chatArea.classList.add('active');
+                document.getElementById('mobile-back').style.display = 'block';
             }
         }
 
-        function toggleLike(btn) {
-            btn.classList.toggle('liked');
-            btn.innerHTML = btn.classList.contains('liked') ? '❤️' : '🤍';
+        function closeChat() {
+            chatArea.classList.remove('active');
         }
 
         function sendMsg() {
-            const input = document.getElementById('chat-input');
-            if (!input.value) return;
-            const msgs = document.getElementById('chat-msgs');
+            const text = msgInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'sent');
+            msgInput.value = '';
+            messagesList.scrollTop = messagesList.scrollHeight;
+
+            // Simulação de resposta automática
+            setTimeout(() => {
+                addMessage('Beleza! Entendido. 👍', 'received');
+                messagesList.scrollTop = messagesList.scrollHeight;
+            }, 1000);
+        }
+
+        function addMessage(text, type) {
             const div = document.createElement('div');
-            div.className = 'bubble sent';
-            div.innerText = input.value;
-            msgs.appendChild(div);
-            input.value = '';
-            msgs.scrollTop = msgs.scrollHeight;
+            div.className = `message ${type}`;
+            const now = new Date();
+            const time = now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0');
+            div.innerHTML = `${text}<div class="message-time">${time}</div>`;
+            messagesList.appendChild(div);
         }
 
-        function editProfile() {
-            document.getElementById('edit-area').classList.toggle('hidden');
+        function handleKey(e) {
+            if (e.key === 'Enter') sendMsg();
         }
 
-        function saveName() {
-            const name = document.getElementById('new-name').value;
-            if (name) {
-                document.getElementById('display-name').innerText = name;
-                document.getElementById('new-name').value = '';
-                editProfile();
+        // Ajuste inicial para mobile
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                chatArea.classList.remove('active');
+                document.getElementById('mobile-back').style.display = 'none';
             }
-        }
-
-        window.onload = () => {
-            initFeed();
-            showTab('feed');
-        };
+        });
     </script>
 </body>
 </html>
